@@ -1,0 +1,32 @@
+{
+  "name": "Home Scanner",
+  "version": "1.0",
+  "description": "Search all homes by coordinates",
+  "background": {
+    "scripts": [
+      "background.js",
+      "dist/js/jquery-3.4.1.min.js",
+      "dist/js/bootstrap.min.js",
+      "house-finder.js",
+      "popup.js"
+    ],
+    "persistent": true
+  },
+  "permissions": ["declarativeContent", "storage"],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/get_started16.png",
+      "32": "images/get_started32.png",
+      "48": "images/get_started48.png",
+      "128": "images/get_started128.png"
+    }
+  },
+  "icons": {
+    "16": "images/get_started16.png",
+    "32": "images/get_started32.png",
+    "48": "images/get_started48.png",
+    "128": "images/get_started128.png"
+  },
+  "manifest_version": 2
+}

@@ -6,6 +6,7 @@ h1 {
   text-align: center;
 }
 
-#coords {
+#coords,
+#resultsNum {
   text-align: center;
 }

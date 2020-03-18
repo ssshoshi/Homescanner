@@ -8,10 +8,10 @@ chrome.storage.local.get("data", function(items) {
     document.querySelector("#coords").innerText = latLong;
     lat = parseFloat(coords[0]);
     long = parseFloat(coords[1]);
-    urlParams = `?searchQueryState={"pagination":{},"mapBounds":${getMapBoundaries(
+    urlParams = `{"pagination":{},"mapBounds":${getMapBoundaries(
       lat,
       long
-    )},"isMapVisible":true,"mapZoom":18}`;
+    )},"isMapVisible":true,"mapZoom":19}`;
   }
   getJSON();
 });
@@ -32,8 +32,18 @@ const searchList = () => {
   }
 };
 
-document.getElementById("search").addEventListener("keyup", searchList);
+// document.getElementById("search").addEventListener("keyup", searchList);
+let input = document.getElementById("search");
+let timeout = null;
+input.addEventListener("keyup", function(e) {
+  clearTimeout(timeout);
+  timeout = setTimeout(function() {
+    console.log("hi");
+    searchList();
+  }, 500);
+});
 
+// refresh button
 document.querySelector("#refresh").addEventListener("click", function() {
   listingsArr = [];
   document.querySelector(".list").innerHTML = "";
@@ -80,8 +90,8 @@ const render = () => {
 
 function getMapBoundaries(lat, long) {
   const coords = {};
-  const x = 0.0045;
-  const y = 0.009709;
+  const x = 0.002743;
+  const y = 0.002743;
 
   coords.west = long - y;
   coords.east = long + y;
@@ -92,8 +102,8 @@ function getMapBoundaries(lat, long) {
 
 function getJSON() {
   let url =
-    "https://cors-anywhere.herokuapp.com/https://www.zillow.com/search/GetSearchPageState.htm" +
-    urlParams;
+    "https://cors-anywhere.herokuapp.com/https://www.zillow.com/search/GetSearchPageState.htm?searchQueryState=" +
+    encodeURIComponent(urlParams);
   document.querySelector(".spinner-border").style.display = "";
   fetch(url)
     .then(response => {
@@ -127,6 +137,7 @@ function getJSON() {
           sqft = homes[i].area ? homes[i].area : "--";
           beds = homes[i].beds ? homes[i].beds : "--";
           baths = homes[i].baths ? homes[i].baths : "--";
+
           listingsArr.push({
             addr,
             imgSrc,
@@ -140,7 +151,10 @@ function getJSON() {
           });
         }
       }
+      console.log(listingsArr.length);
       document.querySelector(".spinner-border").style.display = "none";
+      document.querySelector("#resultsNum").innerText =
+        listingsArr.length + " Results";
       render();
     });
 }

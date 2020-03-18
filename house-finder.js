@@ -1,44 +1,49 @@
 let listingsArr = [];
-let lat, long, urlParams;
+let lat1, long1, urlParams;
 
 chrome.storage.local.get("data", function(items) {
   if (!chrome.runtime.error) {
     let latLong = items.data;
     let coords = latLong.replace(/\s/g, "").split(",");
     document.querySelector("#coords").innerText = latLong;
-    lat = parseFloat(coords[0]);
-    long = parseFloat(coords[1]);
+    lat1 = parseFloat(coords[0]);
+    long1 = parseFloat(coords[1]);
     urlParams = `{"pagination":{},"mapBounds":${getMapBoundaries(
-      lat,
-      long
+      lat1,
+      long1
     )},"isMapVisible":true,"mapZoom":19}`;
   }
   getJSON();
 });
 
-//Filter listings by address
+// Filter listings by address
 const searchList = () => {
-  let input, filter, addr;
+  let input,
+    filter,
+    addr,
+    results = 0;
   input = document.getElementById("search");
   filter = input.value.toUpperCase();
   list = document.querySelectorAll(".addr");
+
   for (i = 0; i < list.length; i++) {
     addr = list[i].innerText || list[i].textContent;
     if (addr.toUpperCase().indexOf(filter) > -1) {
       list[i].closest(".listing").style.display = "";
+      results += 1;
     } else {
       list[i].closest(".listing").style.display = "none";
     }
   }
+  document.getElementById("resultsNum").innerText = results + " results";
 };
 
-// document.getElementById("search").addEventListener("keyup", searchList);
+// delay on search input
 let input = document.getElementById("search");
 let timeout = null;
 input.addEventListener("keyup", function(e) {
   clearTimeout(timeout);
   timeout = setTimeout(function() {
-    console.log("hi");
     searchList();
   }, 500);
 });
@@ -60,15 +65,18 @@ function listing(e) {
         <img src=${e.imgSrc} loading="lazy" class="card-img-top embed-responsive-item"/>
       </div>
       <div class="card-body row pb-0 pt-0">
-        <div class="col-6 align-self-end">
+        <div class="col-6 align-self-start mt-2">
           <a href="https://zillow.com${e.detailUrl}" target="_blank"><h5 class="mb-0 addr">${e.addr}</h5></a>
-          <a href="https://www.google.com/maps/search/?api=1&query=${e.latLong}" target="_blank">${e.latLong}</a>
+          <a href="https://zillow.com${e.detailUrl}" target="_blank"><h5 class="mb-0 addr">${e.city}, ${e.state} ${e.zipcode}</h5></a>
+         
+          <a href="https://www.google.com/maps/search/?api=1&query=${e.lat},${e.long}" target="_blank">${e.lat}, ${e.long}</a>
           <p class="mb-0 type">${e.homeType}</p>
         </div>
-        <div class="col-6 text-right align-self-end">
+        <div class="col-6 text-right align-self-start mt-2">
           <div><span class="font-weight-bold">${e.imgCount} </span>imgs</div>
           <div><span class="font-weight-bold">${e.sqft}</span> sqft</div>
           <div><span class="font-weight-bold">${e.beds}</span> bd <span class="font-weight-bold">${e.baths}</span> ba</div>
+          <div><span class="font-weight-bold">${e.distance}</span>m away</div>
         </div>
       </div>
     </div>
@@ -76,6 +84,34 @@ function listing(e) {
 `
   );
 }
+
+// calculate distance
+const getDistance = (lat1, lon1, lat2, lon2, unit) => {
+  if (lat1 == lat2 && lon1 == lon2) {
+    return 0;
+  } else {
+    var radlat1 = (Math.PI * lat1) / 180;
+    var radlat2 = (Math.PI * lat2) / 180;
+    var theta = lon1 - lon2;
+    var radtheta = (Math.PI * theta) / 180;
+    var dist =
+      Math.sin(radlat1) * Math.sin(radlat2) +
+      Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+    if (dist > 1) {
+      dist = 1;
+    }
+    dist = Math.acos(dist);
+    dist = (dist * 180) / Math.PI;
+    dist = dist * 60 * 1.1515;
+    if (unit == "K") {
+      dist = dist * 1.609344;
+    }
+    if (unit == "N") {
+      dist = dist * 0.8684;
+    }
+    return dist;
+  }
+};
 
 const render = () => {
   const dropdown = document.querySelector("#homeType");
@@ -111,50 +147,77 @@ function getJSON() {
     })
     .then(data => {
       let addr,
+        city,
+        state,
+        zipcode,
         imgSrc,
         detailUrl,
         homeType,
-        latLong,
+        lat,
+        long,
         imgCount,
         sqft,
         beds,
-        baths;
+        baths,
+        distance;
       let homes = data.searchResults.mapResults;
       for (let i in homes) {
         if (homes[i].zpid || homes[i].buildingId) {
           addr = homes[i].buildingId
             ? homes[i].statusText
             : homes[i].hdpData.homeInfo.streetAddress;
+          city = homes[i].hasOwnProperty("hdpData")
+            ? homes[i].hdpData.homeInfo.city
+            : "--";
+          state = homes[i].hasOwnProperty("hdpData")
+            ? homes[i].hdpData.homeInfo.state
+            : "--";
+          zipcode = homes[i].hasOwnProperty("hdpData")
+            ? homes[i].hdpData.homeInfo.zipcode
+            : "--";
           imgSrc =
             homes[i].imgCount === 0 ? homes[i].streetViewURL : homes[i].imgSrc;
           detailUrl = homes[i].detailUrl;
           homeType = homes[i].buildingId
             ? "APARTMENT"
             : homes[i].hdpData.homeInfo.homeType;
-          latLong =
-            homes[i].latLong.latitude + "," + homes[i].latLong.longitude;
+          lat = homes[i].latLong.latitude;
+          long = homes[i].latLong.longitude;
           imgCount = homes[i].imgCount;
           sqft = homes[i].area ? homes[i].area : "--";
           beds = homes[i].beds ? homes[i].beds : "--";
           baths = homes[i].baths ? homes[i].baths : "--";
-
+          distance = Math.round(
+            getDistance(
+              lat1,
+              long1,
+              homes[i].latLong.latitude,
+              homes[i].latLong.longitude,
+              "K"
+            ) * 1000
+          );
           listingsArr.push({
             addr,
+            city,
+            state,
+            zipcode,
             imgSrc,
             detailUrl,
             homeType,
-            latLong,
+            lat,
+            long,
             imgCount,
             sqft,
             beds,
-            baths
+            baths,
+            distance
           });
         }
       }
-      console.log(listingsArr.length);
       document.querySelector(".spinner-border").style.display = "none";
       document.querySelector("#resultsNum").innerText =
         listingsArr.length + " Results";
+      listingsArr.sort((a, b) => a.distance - b.distance);
       render();
     });
 }

@@ -55,7 +55,7 @@ document.querySelector("#refresh").addEventListener("click", function() {
   getJSON();
 });
 
-function listing(e) {
+const listing = e => {
   document.querySelector(".list").insertAdjacentHTML(
     "beforeend",
     `
@@ -83,7 +83,7 @@ function listing(e) {
 </div>
 `
   );
-}
+};
 
 // calculate distance
 const getDistance = (lat1, lon1, lat2, lon2, unit) => {
@@ -124,7 +124,7 @@ const render = () => {
   });
 };
 
-function getMapBoundaries(lat, long) {
+const getMapBoundaries = (lat, long) => {
   const coords = {};
   const x = 0.002743;
   const y = 0.002743;
@@ -134,9 +134,9 @@ function getMapBoundaries(lat, long) {
   coords.south = lat - x;
   coords.north = lat + x;
   return JSON.stringify(coords);
-}
+};
 
-function getJSON() {
+const getJSON = () => {
   let url =
     "https://cors-anywhere.herokuapp.com/https://www.zillow.com/search/GetSearchPageState.htm?searchQueryState=" +
     encodeURIComponent(urlParams);
@@ -164,7 +164,7 @@ function getJSON() {
       for (let i in homes) {
         if (homes[i].zpid || homes[i].buildingId) {
           addr = homes[i].buildingId
-            ? homes[i].statusText
+            ? homes[i].detailUrl.split("/")[2].replace(/-/g, " ")
             : homes[i].hdpData.homeInfo.streetAddress;
           city = homes[i].hasOwnProperty("hdpData")
             ? homes[i].hdpData.homeInfo.city
@@ -220,4 +220,4 @@ function getJSON() {
       listingsArr.sort((a, b) => a.distance - b.distance);
       render();
     });
-}
+};

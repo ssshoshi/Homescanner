@@ -138,87 +138,80 @@ const getMapBoundaries = (lat, long) => {
 };
 
 const getJSON = () => {
-  let url =
-    "https://cors-anywhere.herokuapp.com/https://www.zillow.com/search/GetSearchPageState.htm?searchQueryState=" +
-    encodeURIComponent(urlParams);
-  document.querySelector(".spinner-border").style.display = "";
-  fetch(url)
-    .then(response => {
-      return response.json();
-    })
-    .then(data => {
-      let addr,
-        city,
-        state,
-        zipcode,
-        imgSrc,
-        detailUrl,
-        homeType,
-        lat,
-        long,
-        imgCount,
-        sqft,
-        beds,
-        baths,
-        distance;
-      let homes = data.searchResults.mapResults;
-      for (let i in homes) {
-        if (homes[i].zpid || homes[i].buildingId) {
-          addr = homes[i].buildingId
-            ? homes[i].detailUrl.split("/")[2].replace(/-/g, " ")
-            : homes[i].hdpData.homeInfo.streetAddress;
-          city = homes[i].hasOwnProperty("hdpData")
-            ? homes[i].hdpData.homeInfo.city
-            : "--";
-          state = homes[i].hasOwnProperty("hdpData")
-            ? homes[i].hdpData.homeInfo.state
-            : "--";
-          zipcode = homes[i].hasOwnProperty("hdpData")
-            ? homes[i].hdpData.homeInfo.zipcode
-            : "--";
-          imgSrc =
-            homes[i].imgCount === 0 ? homes[i].streetViewURL : homes[i].imgSrc;
-          detailUrl = homes[i].detailUrl;
-          homeType = homes[i].buildingId
-            ? "APARTMENT"
-            : homes[i].hdpData.homeInfo.homeType;
-          lat = homes[i].latLong.latitude;
-          long = homes[i].latLong.longitude;
-          imgCount = homes[i].imgCount;
-          sqft = homes[i].area ? homes[i].area : "--";
-          beds = homes[i].beds ? homes[i].beds : "--";
-          baths = homes[i].baths ? homes[i].baths : "--";
-          distance = Math.round(
-            getDistance(
-              lat1,
-              long1,
-              homes[i].latLong.latitude,
-              homes[i].latLong.longitude,
-              "K"
-            ) * 1000
-          );
-          listingsArr.push({
-            addr,
-            city,
-            state,
-            zipcode,
-            imgSrc,
-            detailUrl,
-            homeType,
-            lat,
-            long,
-            imgCount,
-            sqft,
-            beds,
-            baths,
-            distance
-          });
-        }
+  chrome.runtime.sendMessage({ urlParams: urlParams }, response => {
+    document.querySelector(".spinner-border").style.display = "";
+    let addr,
+      city,
+      state,
+      zipcode,
+      imgSrc,
+      detailUrl,
+      homeType,
+      lat,
+      long,
+      imgCount,
+      sqft,
+      beds,
+      baths,
+      distance;
+    let homes = response;
+    for (let i in homes) {
+      if (homes[i].zpid || homes[i].buildingId) {
+        addr = homes[i].buildingId
+          ? homes[i].detailUrl.split("/")[2].replace(/-/g, " ")
+          : homes[i].hdpData.homeInfo.streetAddress;
+        city = homes[i].hasOwnProperty("hdpData")
+          ? homes[i].hdpData.homeInfo.city
+          : "--";
+        state = homes[i].hasOwnProperty("hdpData")
+          ? homes[i].hdpData.homeInfo.state
+          : "--";
+        zipcode = homes[i].hasOwnProperty("hdpData")
+          ? homes[i].hdpData.homeInfo.zipcode
+          : "--";
+        imgSrc =
+          homes[i].imgCount === 0 ? homes[i].streetViewURL : homes[i].imgSrc;
+        detailUrl = homes[i].detailUrl;
+        homeType = homes[i].buildingId
+          ? "APARTMENT"
+          : homes[i].hdpData.homeInfo.homeType;
+        lat = homes[i].latLong.latitude;
+        long = homes[i].latLong.longitude;
+        imgCount = homes[i].imgCount;
+        sqft = homes[i].area ? homes[i].area : "--";
+        beds = homes[i].beds ? homes[i].beds : "--";
+        baths = homes[i].baths ? homes[i].baths : "--";
+        distance = Math.round(
+          getDistance(
+            lat1,
+            long1,
+            homes[i].latLong.latitude,
+            homes[i].latLong.longitude,
+            "K"
+          ) * 1000
+        );
+        listingsArr.push({
+          addr,
+          city,
+          state,
+          zipcode,
+          imgSrc,
+          detailUrl,
+          homeType,
+          lat,
+          long,
+          imgCount,
+          sqft,
+          beds,
+          baths,
+          distance
+        });
       }
-      document.querySelector(".spinner-border").style.display = "none";
-      document.querySelector("#resultsNum").innerText =
-        listingsArr.length + " Results";
-      listingsArr.sort((a, b) => a.distance - b.distance);
-      render();
-    });
+    }
+    document.querySelector(".spinner-border").style.display = "none";
+    document.querySelector("#resultsNum").innerText =
+      listingsArr.length + " Results";
+    listingsArr.sort((a, b) => a.distance - b.distance);
+    render();
+  });
 };

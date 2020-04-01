@@ -29,6 +29,7 @@ const searchList = () => {
   for (i = 0; i < list.length; i++) {
     addr = list[i].innerText || list[i].textContent;
     if (addr.toUpperCase().indexOf(filter) > -1) {
+      console.log(filter);
       list[i].closest(".listing").style.display = "";
       results += 1;
     } else {
@@ -67,7 +68,7 @@ const listing = e => {
       <div class="card-body row pb-0 pt-0">
         <div class="col-6 align-self-start mt-2">
           <a href="https://zillow.com${e.detailUrl}" target="_blank"><h5 class="mb-0 addr">${e.addr}</h5></a>
-          <a href="https://zillow.com${e.detailUrl}" target="_blank"><h5 class="mb-0 addr">${e.city}, ${e.state} ${e.zipcode}</h5></a>
+          <a href="https://zillow.com${e.detailUrl}" target="_blank"><h5 class="mb-0">${e.city}, ${e.state} ${e.zipcode}</h5></a>
          
           <a href="https://www.google.com/maps/search/?api=1&query=${e.lat},${e.long}" target="_blank">${e.lat}, ${e.long}</a>
           <p class="mb-0 type">${e.homeType}</p>

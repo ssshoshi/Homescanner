@@ -1,7 +1,7 @@
 let listingsArr = [];
-let lat1, long1, urlParams;
+let lat1, long1, urlParams, svStatus;
 
-chrome.storage.local.get("data", function(items) {
+chrome.storage.local.get("data", function (items) {
   if (!chrome.runtime.error) {
     let latLong = items.data;
     let coords = latLong.replace(/\s/g, "").split(",");
@@ -42,35 +42,44 @@ const searchList = () => {
 // delay on search input
 let input = document.getElementById("search");
 let timeout = null;
-input.addEventListener("keyup", function(e) {
+input.addEventListener("keyup", function (e) {
   clearTimeout(timeout);
-  timeout = setTimeout(function() {
+  timeout = setTimeout(function () {
     searchList();
   }, 500);
 });
 
 // refresh button
-document.querySelector("#refresh").addEventListener("click", function() {
+document.querySelector("#refresh").addEventListener("click", function () {
   listingsArr = [];
   document.querySelector(".list").innerHTML = "";
   getJSON();
+  render();
 });
 
-const listing = e => {
+const listing = (e) => {
   document.querySelector(".list").insertAdjacentHTML(
     "beforeend",
     `
-  <div class="col-md-6 mb-2 listing">
-    <div class="card mb-2 h-100">
+  <div class="col-md-6 listing">
+    <div class="card mb-2 h-100 hovernow">
       <div class="embed-responsive embed-responsive-16by9">
-        <img src=${e.imgSrc} loading="lazy" class="card-img-top embed-responsive-item"/>
+        <div class="maplinks">
+          <a class="btn btn-sm btn-light" href="https://www.google.com/maps/search/?api=1&query=${e.lat},${e.long}" target="_blank">Google Map</a>
+          <a class="btn btn-sm btn-light" href="https://www.bing.com/maps?where1=${e.lat},${e.long}&style=h&lvl=18" target="_blank">Bing Map</a>
+        </div>
+        <div class="otherLinks">
+          <a class="btn btn-sm btn-light" href="http://googl.com/#q=${e.addr} ${e.city} ${e.state}" target="_blank"><i class="fa fa-search"></i></span></a>
+          <a class="btn btn-sm btn-light" href="https://www.whitepages.com/address/${e.addr}/${e.city}-${e.state}" target="_blank"><i class="fa fa-book"></i></span></a>
+        </div>
+        <img src="${e.imgSrc}" loading="lazy" class="card-img-top embed-responsive-item"/>
       </div>
       <div class="card-body row pb-0 pt-0">
         <div class="col-6 align-self-start mt-2">
-          <a href="https://zillow.com${e.detailUrl}" target="_blank"><h5 class="mb-0 addr">${e.addr}</h5></a>
-          <a href="https://zillow.com${e.detailUrl}" target="_blank"><h5 class="mb-0">${e.city}, ${e.state} ${e.zipcode}</h5></a>
-         
-          <a href="https://www.google.com/maps/search/?api=1&query=${e.lat},${e.long}" target="_blank">${e.lat}, ${e.long}</a>
+          <a id="addrUrl" href="${addrUrl(e)}" target="_blank">
+            <h5 class="mb-0 addr">${e.addr + ", " + e.city + ", " + e.state + " " + e.zipcode}</h5>
+          </a>
+          <a target="_blank" style="float: right" href="http://googl.com/#q=${e.addr + " " + e.city + " " + e.state}"></a>  
           <p class="mb-0 type">${e.homeType}</p>
         </div>
         <div class="col-6 text-right align-self-start mt-2">
@@ -84,6 +93,29 @@ const listing = e => {
 </div>
 `
   );
+};
+
+const getStreetViewMeta = (url) => {
+  let status;
+    jQuery.ajax({
+      url: url,
+      success: function (result) {
+          status = result.status;
+      },
+      async: false
+  });
+return status
+}
+
+  
+
+
+const addrUrl = (e) => {
+  if (e.imgCount === 0) {
+    return `http://googl.com/#q=${e.addr} ${e.city} ${e.state}`;
+  } else {
+    return `https://zillow.com${e.detailUrl}`;
+  }
 };
 
 // calculate distance
@@ -116,13 +148,13 @@ const getDistance = (lat1, lon1, lat2, lon2, unit) => {
 
 const render = () => {
   const dropdown = document.querySelector("#homeType");
-  listingsArr.forEach(e => {
+  for (i of listingsArr) { 
     if (dropdown.value === "ALL") {
-      listing(e);
+      listing(i);
     } else if (e.homeType === dropdown.value) {
-      listing(e);
+      listing(i);
     }
-  });
+  };
 };
 
 const getMapBoundaries = (lat, long) => {
@@ -138,7 +170,7 @@ const getMapBoundaries = (lat, long) => {
 };
 
 const getJSON = () => {
-  chrome.runtime.sendMessage({ urlParams: urlParams }, response => {
+  chrome.runtime.sendMessage({ urlParams: urlParams }, (response) => {
     document.querySelector(".spinner-border").style.display = "";
     let addr,
       city,
@@ -146,6 +178,7 @@ const getJSON = () => {
       zipcode,
       imgSrc,
       detailUrl,
+      streetViewMetadataURL,
       homeType,
       lat,
       long,
@@ -153,7 +186,10 @@ const getJSON = () => {
       sqft,
       beds,
       baths,
+      streetViewURL,
+      status,
       distance;
+    console.log(response);
     let homes = response;
     for (let i in homes) {
       if (homes[i].zpid || homes[i].buildingId) {
@@ -169,8 +205,8 @@ const getJSON = () => {
         zipcode = homes[i].hasOwnProperty("hdpData")
           ? homes[i].hdpData.homeInfo.zipcode
           : "--";
-        imgSrc =
-          homes[i].imgCount === 0 ? homes[i].streetViewURL : homes[i].imgSrc;
+        streetViewURL = homes[i].streetViewURL;
+        streetViewMetadataURL = homes[i].streetViewMetadataURL;
         detailUrl = homes[i].detailUrl;
         homeType = homes[i].buildingId
           ? "APARTMENT"
@@ -181,6 +217,9 @@ const getJSON = () => {
         sqft = homes[i].area ? homes[i].area : "--";
         beds = homes[i].beds ? homes[i].beds : "--";
         baths = homes[i].baths ? homes[i].baths : "--";
+        status = getStreetViewMeta(homes[i].streetViewMetadataURL);
+        imgSrc = (getStreetViewMeta(homes[i].streetViewMetadataURL) === "OK") ? homes[i].streetViewURL : homes[i].imgSrc;
+        console.log(imgSrc);
         distance = Math.round(
           getDistance(
             lat1,
@@ -195,7 +234,6 @@ const getJSON = () => {
           city,
           state,
           zipcode,
-          imgSrc,
           detailUrl,
           homeType,
           lat,
@@ -204,7 +242,11 @@ const getJSON = () => {
           sqft,
           beds,
           baths,
-          distance
+          distance,
+          streetViewMetadataURL,
+          streetViewURL,
+          imgSrc,
+          status
         });
       }
     }
@@ -212,6 +254,10 @@ const getJSON = () => {
     document.querySelector("#resultsNum").innerText =
       listingsArr.length + " Results";
     listingsArr.sort((a, b) => a.distance - b.distance);
+    console.log(listingsArr)
     render();
   });
 };
+
+
+

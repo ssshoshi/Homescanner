@@ -45,3 +45,24 @@ h1 {
 .listing {
   padding: 5px;
 }
+
+.streetview {
+  position: absolute;
+  z-index: 2;
+  top: 5px;
+  right: 5px;
+}
+
+.zoom {
+  position: absolute;
+  z-index: 2;
+  top: 5px;
+  right: 5px;
+}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}

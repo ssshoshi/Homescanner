@@ -10,21 +10,21 @@
   </head>
   <body>
     <div class="container">
-      <h1>Homescanner</h1>
+      <h1>Home Scanner</h1>
       <p id="coords">Coordinates</p>
       <p id="resultsNum">Results</p>
-      <div class="d-flex align-items-center flex-column mb-3">
+      <div class="form-group w-50 mx-auto">
         <div>
-          <select id="homeType">
+          <!-- <select class="form-control" id="homeType">
             <option value="ALL">All</option>
             <option value="CONDO">Condo</option>
             <option value="SINGLE_FAMILY">Single Family</option>
             <option value="APARTMENT">Apartment</option>
             <option value="MULTI_FAMILY">Multi-Family</option>
-          </select>
+          </select> -->
+          <input class="form-control" id="search" type="text" placeholder="search" />
+          <!-- <button id="refresh">Refresh</button> -->
         </div>
-        <input id="search" type="text" placeholder="search" />
-        <button id="refresh">Refresh</button>
       </div>
       <div class="d-flex justify-content-center h-100">
         <div class="spinner-border" role="status">
@@ -34,7 +34,7 @@
       <div class="list row"></div>
     </div>
     <script type="text/javascript" src="dist/js/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="house-finder.js"></script>
   </body>
 </html>

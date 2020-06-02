@@ -4,6 +4,8 @@
 
 h1 {
   text-align: center;
+  color: rgb(0, 106, 255);
+  font-weight: bold;
 }
 
 #coords,
@@ -24,7 +26,7 @@ h1 {
 }
 
 .card-img-top {
-  position: relative;
+  position: absolute;
   z-index: 1;
 }
 
@@ -39,6 +41,13 @@ h1 {
   position: absolute;
   z-index: 2;
   bottom: 5px;
+  right: 5px;
+}
+
+.expand {
+  position: absolute;
+  z-index: 2;
+  top: 5px;
   right: 5px;
 }
 
@@ -66,3 +75,61 @@ h1 {
   margin-right: auto;
   width: 50%;
 }
+
+.hovernow {
+  border-bottom: 3px solid rgb(0, 106, 255);
+}
+
+
+#coords {
+  font-weight: bold;
+}
+
+.tooltip-inner {
+  background: rgb(0, 106, 255);
+  color: white;
+  border: 1px solid rgb(0, 106, 255);
+}
+
+
+.bs-tooltip-auto[x-placement^=bottom] .arrow::before,
+.bs-tooltip-bottom .arrow::before {
+  border-bottom-color: #f00;
+  /* Red */
+}
+
+.fa, .btn {
+  color: rgb(0, 106, 255);
+}
+
+.btn:hover {
+  color: white;
+  background-color: rgb(0, 106, 255);
+  border: rgb(0, 106, 255) solid 1px;
+}
+
+.btn:hover i {
+  color: white;
+}
+
+.btn:active {
+  color: rgb(0, 106, 255);
+}
+
+.spinner-border {
+  color: rgb(0, 106, 255);
+}
+
+#search {
+  border: 1px solid rgb(0, 106, 255);
+}
+
+.modal-body {
+  padding: 0;
+    bottom: 33vh;
+}
+
+img {
+  position: absolute;
+}
+

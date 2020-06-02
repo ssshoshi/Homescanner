@@ -52,19 +52,11 @@ input.addEventListener("keyup", function (e) {
   }, 500);
 });
 
-// refresh button
-// document.querySelector("#refresh").addEventListener("click", function () {
-//   listingsArr = [];
-//   listingsArrResolved = [];
-//   document.querySelector(".list").innerHTML = "";
-//   getJSON();
-//   render();
-// });
-
 function toCamel(string){
   return string.toLowerCase().replace(/(?:_| |\b)(\w)/g, function($1){return $1.toUpperCase().replace('_',' ');});
 }
 
+// render listing
 const listing = async (e) => {
 
   document.querySelector(".list").insertAdjacentHTML(
@@ -78,12 +70,13 @@ const listing = async (e) => {
           <a class="btn btn-sm btn-light" href="https://www.bing.com/maps?where1=${e.lat},${e.long}&style=h&lvl=18" target="_blank">Bing Map</a>
         </div>
         <div class="otherLinks">
-          <a class="btn btn-sm btn-light" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${e.lat},${e.long}&heading=-45&fov=80" target="_blank" data-toggle="tooltip" data-placement="top" title="Streetview"><i class="fa fa-street-view"></i></span></a>
-          <a class="btn btn-sm btn-light" href="http://googl.com/#q=${e.addr} ${e.city} ${e.state}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></span></a>
-          <a class="btn btn-sm btn-light" href="https://www.whitepages.com/address/${e.addr}/${e.city}-${e.state}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></span></a>
+          <a class="btn btn-sm btn-light" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${e.lat},${e.long}&heading=-45&fov=80" target="_blank" data-toggle="tooltip" data-placement="top" title="Streetview"><i class="fa fa-street-view"></i></a>
+          <a class="btn btn-sm btn-light" href="http://googl.com/#q=${e.addr} ${e.city} ${e.state}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
+          <a class="btn btn-sm btn-light" href="https://www.whitepages.com/address/${e.addr}/${e.city}-${e.state}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
         </div>
+        <a class="btn btn-sm btn-light expand" data-imgone="https://maps.googleapis.com/maps/api/staticmap?center=${e.lat},${e.long}&zoom=18&size=800x800&maptype=satellite&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI&markers=color:red%7Csize:small%7C${e.lat},${e.long}" data-imgtwo="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
         <div class="toggle">
-          <img src="https://maps.googleapis.com/maps/api/staticmap?center=${e.lat},${e.long}&zoom=18&size=575x242&maptype=satellite&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI&markers=color:red%7Csize:small%7C${e.lat},${e.long}" loading="lazy" class="card-img-top embed-responsive-item map style="display: none"/>
+          <img src="https://maps.googleapis.com/maps/api/staticmap?center=${e.lat},${e.long}&zoom=18&size=575x242&maptype=satellite&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI&markers=color:red%7Csize:small%7C${e.lat},${e.long}" loading="lazy" class="card-img-top embed-responsive-item map"/>
           <img src="${e.imgSrc}" loading="lazy" class="card-img-top embed-responsive-item"/>
         </div>
       </div>
@@ -96,10 +89,10 @@ const listing = async (e) => {
           <p class="mb-0 type">${toCamel(e.homeType)}</p>
         </div>
         <div class="col-6 text-right align-self-start mt-2">
-          <div><span class="font-weight-bold">${e.imgCount} </span>imgs</div>
-          <div><span class="font-weight-bold">${e.sqft}</span> sqft</div>
-          <div><span class="font-weight-bold">${e.beds}</span> bd <span class="font-weight-bold">${e.baths}</span> ba</div>
-          <div><span class="font-weight-bold">${e.distance}</span>m away</div>
+          <div><strong>${e.imgCount} </strong>imgs</div>
+          <div><strong>${e.sqft}</strong> sqft</div>
+          <div><strong>${e.beds}</strong> bd <strong class="font-weight-bold">${e.baths}</strong> ba</div>
+          <div><strong>${e.distance}</strong>m away</div>
         </div>
       </div>
     </div>
@@ -107,8 +100,7 @@ const listing = async (e) => {
 `)
 }
 
-
-
+// fetch Zillow map metadata
 const getStreetViewMeta = async (url) => {
   const fetchResult = fetch(url)
   const response = await fetchResult
@@ -145,11 +137,11 @@ const getDistance = (lat1, lon1, lat2, lon2, unit) => {
   }
 };
 
+// render all listings
 const render = async () => {
   for (let i = 0; i < listingsArr.length; i++) {
     listing(listingsArr[i])
    }
-
 };
 
 const getMapBoundaries = (lat, long) => {
@@ -164,12 +156,17 @@ const getMapBoundaries = (lat, long) => {
   return JSON.stringify(coords);
 };
 
+// document.querySelectorAll(".expand").addEventListener("click", function(){
+//   this.closest(".listing").addClass("expand").
+
+// })
+
+
 
 
 const getJSON = async () => {
   chrome.runtime.sendMessage({ urlParams: urlParams }, async (response) => {
     document.querySelector(".spinner-border").style.display = "";
-    console.log(response);
     let homes = response;
     for (let home of homes) {
       if (home.zpid || home.buildingId) {
@@ -189,11 +186,10 @@ const getJSON = async () => {
           sqft: home.area ? home.area : "--",
           beds: home.beds ? home.beds : "--",
           baths: home.baths ? home.baths : "--",
-          imgSrc: home.imgCount > 0 ? home.imgSrc : `https://maps.googleapis.com/maps/api/staticmap?center=${home.latLong.latitude},${home.latLong.longitude}&zoom=19&size=575x242&maptype=satellite&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI&markers=color:red%7Csize:small%7C${home.latLong.latitude},${home.latLong.longitude}`,
+          imgSrc: home.imgCount > 0 ? home.imgSrc : `https://maps.googleapis.com/maps/api/staticmap?center=${home.latLong.latitude},${home.latLong.longitude}&zoom=19&size=800x800&maptype=satellite&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI&markers=color:red%7Csize:small%7C${home.latLong.latitude},${home.latLong.longitude}`,
           distance: Math.round(getDistance(lat1, long1, home.latLong.latitude, home.latLong.longitude, "K") * 1000),
         }
-        house.streetViewURL = `https://maps.googleapis.com/maps/api/streetview?location=${encodeURIComponent(house.addr)}+${encodeURIComponent(house.city)}+${encodeURIComponent(house.state)}&size=800x900&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`
-        console.log(house)
+        house.streetViewURL = `https://maps.googleapis.com/maps/api/streetview?location=${encodeURIComponent(house.addr)}+${encodeURIComponent(house.city)}+${encodeURIComponent(house.state)}&size=800x800&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`
         promises.push(house.status)
         streetViewArr.push(house.streetViewURL)
         listingsArr.push(house)
@@ -208,10 +204,18 @@ const getJSON = async () => {
       }
     })
 
-    setTimeout(() => {
+    $('#exampleModalCenter').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget) // Button that triggered the modal
+      var imgOne = button.data('imgone') 
+      var imgTwo = button.data('imgtwo') 
+      var modal = $(this)
+      modal.find('.static').attr('src', imgOne)
+      modal.find('.main').attr('src', imgTwo)
+    })
 
+    setTimeout(() => {
       document.querySelector(".spinner-border").style.display = "none";
-      document.querySelector("#resultsNum").innerText = listingsArr.length + " Results";
+      document.querySelector("#resultsNum").innerHTML = `<strong>${listingsArr.length}</strong> Results`;
       listingsArr.sort((a, b) => a.distance - b.distance);
       console.log(listingsArr)
       render()
@@ -220,6 +224,10 @@ const getJSON = async () => {
       })
       $( ".toggle" ).click(function() {
         $(this.childNodes[3]).toggle();
+      });
+      $( ".toggleModal" ).click(function() {
+        $(this.childNodes[3]).toggle();
+        $(this.childNodes[1]).toggle();
       });
     }, 1000)
   });

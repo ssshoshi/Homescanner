@@ -1,6 +1,4 @@
 let listingsArr = [];
-let streetViewArr = [];
-let promises = [];
 let lat1, long1, urlParams, svStatus;
 
 chrome.storage.local.get("data", async (items) => {
@@ -70,7 +68,7 @@ const listing = async (e) => {
           <a class="btn btn-sm btn-light" href="https://www.bing.com/maps?where1=${e.lat},${e.long}&style=h&lvl=18" target="_blank">Bing Map</a>
         </div>
         <div class="otherLinks">
-          <a class="btn btn-sm btn-light" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${e.lat},${e.long}&heading=-45&fov=80" target="_blank" data-toggle="tooltip" data-placement="top" title="Streetview"><i class="fa fa-street-view"></i></a>
+          <a class="btn btn-sm btn-light" href="https://www.google.com/maps/@?api=1&map_action=pano&pano=${e.pano_id}&viewpoint=${e.svLat},${e.svLng}" target="_blank" data-toggle="tooltip" data-placement="top" title="Streetview"><i class="fa fa-street-view"></i></a>
           <a class="btn btn-sm btn-light" href="http://googl.com/#q=${e.addr} ${e.city} ${e.state}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
           <a class="btn btn-sm btn-light" href="https://www.whitepages.com/address/${e.addr}/${e.city}-${e.state}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
         </div>
@@ -101,11 +99,12 @@ const listing = async (e) => {
 }
 
 // fetch Zillow map metadata
-const getStreetViewMeta = async (url) => {
+
+const getStreetViewMeta = async (url, type) => {
   const fetchResult = fetch(url)
   const response = await fetchResult
   const jsonData = await response.json()
-  return jsonData.status
+  return jsonData
 }
 
 
@@ -168,15 +167,17 @@ const getJSON = async () => {
   chrome.runtime.sendMessage({ urlParams: urlParams }, async (response) => {
     document.querySelector(".spinner-border").style.display = "";
     let homes = response;
+    console.log(homes)
     for (let home of homes) {
       if (home.zpid || home.buildingId) {
-        let house = {
-          status: home.streetViewURL ? getStreetViewMeta(home.streetViewMetadataURL) : "NOT OK",
+        let house = { 
+          pano_id: null,
+          status: [],
           addr: home.buildingId ? home.detailUrl.split("/")[2].replace(/-/g, " ") : home.hdpData.homeInfo.streetAddress,
           city: home.hasOwnProperty("hdpData") ? home.hdpData.homeInfo.city : "--",
           state: home.hasOwnProperty("hdpData") ? home.hdpData.homeInfo.state : "--",
           zipcode: home.hasOwnProperty("hdpData") ? home.hdpData.homeInfo.zipcode : "--",
-          streetViewURL: null,
+          streetViewURL: home.streetViewURL,
           streetViewMetadataURL: home.streetViewMetadataURL,
           detailUrl: home.detailUrl,
           homeType: home.buildingId ? "APARTMENT" : home.hdpData.homeInfo.homeType,
@@ -187,22 +188,33 @@ const getJSON = async () => {
           beds: home.beds ? home.beds : "--",
           baths: home.baths ? home.baths : "--",
           imgSrc: home.imgCount > 0 ? home.imgSrc : `https://maps.googleapis.com/maps/api/staticmap?center=${home.latLong.latitude},${home.latLong.longitude}&zoom=19&size=800x800&maptype=satellite&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI&markers=color:red%7Csize:small%7C${home.latLong.latitude},${home.latLong.longitude}`,
-          distance: Math.round(getDistance(lat1, long1, home.latLong.latitude, home.latLong.longitude, "K") * 1000),
+          distance: Math.round(getDistance(lat1, long1, home.latLong.latitude, home.latLong.longitude, "K") * 1000)
         }
-        house.streetViewURL = `https://maps.googleapis.com/maps/api/streetview?location=${encodeURIComponent(house.addr)}+${encodeURIComponent(house.city)}+${encodeURIComponent(house.state)}&size=800x800&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`
-        promises.push(house.status)
-        streetViewArr.push(house.streetViewURL)
+        let addrStreetview = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${encodeURIComponent(house.addr)}+${encodeURIComponent(house.city)}&size=800x800&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`
+        let metaDataOne = getStreetViewMeta(addrStreetview);
+        let metaDataTwo;
+        
+          Promise.resolve(metaDataOne).then(val=> {
+            if (val.status === "OK") {
+              house.pano_id = val.pano_id;
+              house.svLat = val.location.lat
+              house.svLng = val.location.lng
+              if(house.imgCount === 0) {
+                house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${encodeURIComponent(house.addr)}+${encodeURIComponent(house.city)}&size=800x800&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`
+              }
+            } else if (val.status !== "OK"){
+              metaDataTwo = getStreetViewMeta(home.streetViewMetadataURL);
+              Promise.resolve(metaDataTwo).then(value=> {
+                if (value.status === "OK") {
+                house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${home.latLong.latitude},${home.latLong.longitude}&size=800x800&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`
+                }
+              })
+            }
+          })    
+        
         listingsArr.push(house)
       }
     }
-
-    Promise.all(promises).then(val => {
-      for (let i = 0; i < val.length; i++) {
-      if(val[i] === "OK" && listingsArr[i].imgCount === 0){
-        listingsArr[i].imgSrc = streetViewArr[i];
-      }
-      }
-    })
 
     $('#exampleModalCenter').on('show.bs.modal', function (event) {
       var button = $(event.relatedTarget) // Button that triggered the modal
@@ -229,7 +241,7 @@ const getJSON = async () => {
         $(this.childNodes[3]).toggle();
         $(this.childNodes[1]).toggle();
       });
-    }, 1000)
+    }, 3000)
   });
 };
 

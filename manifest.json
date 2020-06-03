@@ -10,7 +10,7 @@
     ],
     "persistent": false
   },
-  "permissions": ["declarativeContent", "storage", "<all_urls>"],
+  "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": ["*://*/house-finder.html"],

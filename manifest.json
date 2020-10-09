@@ -1,6 +1,6 @@
 {
   "name": "Home Scanner",
-  "version": "0.5",
+  "version": "1.0",
   "description": "Search all homes by coordinates",
   "background": {
     "scripts": [

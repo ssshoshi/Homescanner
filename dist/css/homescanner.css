@@ -1,0 +1,209 @@
+.embed-responsive .card-img-top {
+  object-fit: cover;
+}
+
+nav {
+  border-bottom: 1px solid #006aff;
+}
+
+#coords,
+#resultsNum {
+  margin-bottom: 0rem !important;
+}
+
+#coords {
+  white-space: nowrap;
+}
+
+h2 {
+  color: #006aff !important;
+  font-weight: bold !important;
+}
+
+.addr {
+  text-transform: capitalize;
+}
+
+.hovernow {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.hovernow:hover {
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.card-img-top {
+  position: absolute;
+  z-index: 1;
+}
+
+.maplinks {
+  position: absolute;
+  z-index: 2;
+  bottom: 5px;
+  left: 5px;
+}
+
+.otherLinks {
+  position: absolute;
+  z-index: 2;
+  bottom: 5px;
+  right: 5px;
+}
+
+.expand {
+  position: absolute;
+  z-index: 2;
+  top: 5px;
+  right: 5px;
+}
+
+.listing {
+  padding: 5px;
+}
+
+.listings {
+  margin-top: 10rem;
+}
+
+.streetview {
+  position: absolute;
+  z-index: 2;
+  top: 5px;
+  right: 5px;
+}
+
+.zoom {
+  position: absolute;
+  z-index: 2;
+  top: 5px;
+  right: 5px;
+}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+.skBorder {
+  border-bottom: 3px solid #b6b6b6;
+}
+
+.hovernow {
+  border-bottom: 3px solid #006aff;
+}
+
+.tooltip-inner {
+  background: #006aff;
+  color: white;
+  border: 1px solid #006aff;
+}
+
+.bs-tooltip-auto[x-placement^="bottom"] .arrow::before,
+.bs-tooltip-bottom .arrow::before {
+  border-bottom-color: #f00;
+  /* Red */
+}
+
+.fa,
+.btn {
+  color: #006aff;
+}
+
+.btn:hover {
+  color: white;
+  background-color: #006aff;
+  border: #006aff solid 1px;
+}
+
+.btn:hover i {
+  color: white;
+}
+
+.btn:active {
+  color: #006aff;
+}
+
+.spinner-border {
+  color: #006aff;
+}
+
+#search {
+  border: 1px solid #006aff;
+}
+
+.modal-body {
+  padding: 0;
+  bottom: 33vh;
+}
+
+img {
+  position: absolute;
+}
+
+.loading {
+  background-color: #e2e2e2;
+  color: #e2e2e2;
+}
+
+.loading::after {
+  display: block;
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: loading 1.5s infinite;
+}
+
+p.loading,
+div.loading {
+  height: 1.5rem;
+  margin-top: 1px;
+}
+
+.skAddr {
+  width: 75%;
+}
+.skAddr2 {
+  width: 45%;
+}
+.skType {
+  width: 37%;
+}
+.skPrice {
+  width: 42%;
+}
+.skGeo {
+  width: 60%;
+}
+
+.skImgs {
+  width: 25%;
+}
+.skSqft {
+  width: 32%;
+}
+.skBa {
+  width: 32%;
+}
+.skDist {
+  width: 32%;
+}
+.skStatus {
+  width: 60%;
+}
+
+@keyframes loading {
+  100% {
+    transform: translateX(100%);
+  }
+}

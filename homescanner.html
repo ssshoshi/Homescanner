@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/dist/css/homescanner.css" />
+    <link
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+      crossorigin="anonymous"
+    />
+    <title>Home Scanner</title>
+  </head>
+  <body>
+    <nav
+      class="navbar navbar-expand-md navbar-light bg-light shadow p-3 mb-5 bg-white fixed-top"
+    >
+      <div
+        class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2"
+      >
+        <h2>Home Scanner</h2>
+      </div>
+      <div class="mx-auto order-0">
+        <h6 id="coords" class="mx-auto">Coordinates</h6>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target=".dual-collapse2"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+      <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+          <form class="form-inline my-2 my-lg-0">
+            <h6 id="resultsNum" class="mr-2">-- Results</h6>
+            <input
+              id="search"
+              class="form-control mr-sm-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+            />
+          </form>
+        </ul>
+      </div>
+    </nav>
+    <div class="container listings">
+      <div class="d-flex justify-content-center h-100"></div>
+      <div class="list row"></div>
+      <div
+        class="modal fade"
+        id="exampleModalCenter"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true"
+      >
+        <div
+          class="modal-dialog modal-dialog-centered modal-lg"
+          role="document"
+        >
+          <div class="modal-content">
+            <div class="modal-body">
+              <div class="toggleModal">
+                <img
+                  loading="lazy"
+                  class="main card-img-top embed-responsive-item"
+                />
+                <img
+                  loading="lazy"
+                  class="static card-img-top embed-responsive-item"
+                  style="display: none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="dist/js/jquery-3.4.1.min.js"></script>
+    <script
+      type="text/javascript"
+      src="dist/js/bootstrap.bundle.min.js"
+    ></script>
+    <script type="text/javascript" src="/dist/js/homescanner.js"></script>
+  </body>
+</html>

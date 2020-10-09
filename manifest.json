@@ -4,27 +4,32 @@
   "description": "Search all homes by coordinates",
   "background": {
     "scripts": [
-      "background.js",
+      "/dist/js/background.js",
       "dist/js/jquery-3.4.1.min.js",
-      "dist/js/bootstrap.min.js"
+      "dist/js/bootstrap.bundle.min.js"
     ],
     "persistent": false
   },
   "permissions": ["storage"],
   "content_scripts": [
     {
-      "matches": ["*://*/house-finder.html"],
-      "css": ["house-finder.css"],
-      "js": ["house-finder.js"]
+      "matches": ["*://*/homescanner.html"],
+      "css": ["/dist/css/homescanner.css"],
+      "js": ["/dist/js/homescanner.js"]
     },
     {
-      "matches": ["*://*.hostcompliance.com/*", "*://*.homeaway.com/*", "*://*.google.com/maps/*"],
-      "js": ["vrenhancements.js"],
+      "matches": [
+        "*://*.hostcompliance.com/*",
+        "*://*.homeaway.com/*",
+        "*://*.vrbo.com/*",
+        "*://*.google.com/maps/*"
+      ],
+      "js": ["/dist/js/vrenhancements.js"],
       "all_frames": true
     },
     {
       "matches": ["*://*/popup.html"],
-      "js": ["popup.js"]
+      "js": ["/dist/js/popup.js"]
     }
   ],
   "browser_action": {

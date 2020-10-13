@@ -56,7 +56,7 @@ function toCamel(string) {
 }
 
 // render listing
-const listing = async (e) => {
+const renderListing = async (e) => {
   document.querySelector(".list").insertAdjacentHTML(
     "beforeend",
     `
@@ -184,10 +184,15 @@ const getDistance = (lat1, lon1, lat2, lon2, unit) => {
   }
 };
 
+// change column view
+const changeColumnView = () => {
+  const listings = document.querySelectorAll('')
+}
+
 // render all listings
 const render = async () => {
-  for (let i = 0; i < listingsArr.length; i++) {
-    listing(listingsArr[i]);
+  for (listing of listingsArr) {
+    renderListing(listing);
   }
 };
 

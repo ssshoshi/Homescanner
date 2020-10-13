@@ -61,7 +61,8 @@ h2 {
   right: 5px;
 }
 
-.listing {
+.listing,
+.skeleton {
   padding: 5px;
 }
 

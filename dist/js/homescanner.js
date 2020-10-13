@@ -107,7 +107,7 @@ const skeleton = () => {
     document.querySelector(".list").insertAdjacentHTML(
       "beforeend",
       `
-    <div class="col-md-6 mb-2 listing skeleton">
+    <div class="col-md-6 mb-2 skeleton">
         <div class="card mb-2 h-100 skBorder">
             <div class="embed-responsive embed-responsive-16by9">
             <div class="toggle">
@@ -147,7 +147,6 @@ function hideSkeletons() {
   );
 }
 
-
 // fetch Zillow map metadata
 const getStreetViewMeta = async (url) => {
   const fetchResult = fetch(url);
@@ -185,8 +184,24 @@ const getDistance = (lat1, lon1, lat2, lon2, unit) => {
 };
 
 // change column view
-const changeColumnView = () => {
-  const listings = document.querySelectorAll('')
+const threeColumnRow = () => {
+  const listings = document.querySelectorAll('.listing');
+  if(listings[0].classList.contains('col-md-6')) {
+    for(listing of listings) {
+      listing.classList.remove('col-md-6');
+      listing.classList.add('col-md-4');
+    }
+  }
+}
+
+const twoColumnRow = () => {
+  const listings = document.querySelectorAll('.listing');
+  if(listings[0].classList.contains('col-md-4')) {
+    for(listing of listings) {
+      listing.classList.remove('col-md-4');
+      listing.classList.add('col-md-6');
+    }
+  }
 }
 
 // render all listings
@@ -320,3 +335,6 @@ $("#exampleModalCenter").on("show.bs.modal", function (event) {
   modal.find(".static").attr("src", imgOne);
   modal.find(".main").attr("src", imgTwo);
 });
+
+document.getElementById('threeColumn').addEventListener("click", threeColumnRow)
+document.getElementById('twoColumn').addEventListener("click", twoColumnRow)

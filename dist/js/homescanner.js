@@ -80,8 +80,8 @@ const renderListing = async (e) => {
           </div>
           <div class="card-body row pb-0 pt-0">
           <div class="col-6 align-self-start mt-2">
-              <a id="addrUrl" href="https://zillow.com${e.detailUrl}" target="_blank">
-              <h5 class="mb-0 addr">${e.addr + ", " + e.city + ", " + e.state}</h5>
+              <a class="h5" id="addrUrl" href="https://zillow.com${e.detailUrl}" target="_blank">
+              ${e.addr + ", " + e.city + ", " + e.state}
               </a>
               <a target="_blank" style="float: right" href="http://googl.com/#q=${e.addr + " " + e.city + " " + e.state}"></a>  
               <p class="mb-0 type">${toCamel(e.homeType)}</p>
@@ -191,6 +191,11 @@ const threeColumnRow = () => {
       listing.classList.remove('col-md-6');
       listing.classList.add('col-md-4');
     }
+  } else if(listings[0].classList.contains('col-md-12')) {
+    for(listing of listings) {
+    listing.classList.remove('col-md-12');
+    listing.classList.add('col-md-4');
+    }
   }
 }
 
@@ -200,6 +205,25 @@ const twoColumnRow = () => {
     for(listing of listings) {
       listing.classList.remove('col-md-4');
       listing.classList.add('col-md-6');
+    }
+  } else if(listings[0].classList.contains('col-md-12')) {
+    for(listing of listings) {
+    listing.classList.remove('col-md-12');
+    listing.classList.add('col-md-6');
+    }
+  }
+}
+const oneColumnRow = () => {
+  const listings = document.querySelectorAll('.listing');
+  if(listings[0].classList.contains('col-md-6')) {
+    for(listing of listings) {
+      listing.classList.remove('col-md-6');
+      listing.classList.add('col-md-12');
+    }
+  } else if(listings[0].classList.contains('col-md-4')) {
+    for(listing of listings) {
+    listing.classList.remove('col-md-4');
+    listing.classList.add('col-md-12');
     }
   }
 }
@@ -304,6 +328,9 @@ const getJSON = async () => {
       }
     }
 
+
+    
+
     setTimeout(() => {
       hideSkeletons();
       document.querySelector(
@@ -312,6 +339,8 @@ const getJSON = async () => {
       listingsArr.sort((a, b) => a.distance - b.distance);
       console.log(listingsArr);
       render();
+      document.querySelector('.columnBtns').style.display = "flex";
+      
       $(function () {
         $('[data-toggle="tooltip"]').tooltip();
       });
@@ -336,5 +365,37 @@ $("#exampleModalCenter").on("show.bs.modal", function (event) {
   modal.find(".main").attr("src", imgTwo);
 });
 
+//scroll to top of page
+
+
 document.getElementById('threeColumn').addEventListener("click", threeColumnRow)
 document.getElementById('twoColumn').addEventListener("click", twoColumnRow)
+document.getElementById('oneColumn').addEventListener("click", oneColumnRow)
+
+
+const scrollToTopButton = document.getElementById('js-top');
+
+const scrollFunc = () => {
+  let y = window.scrollY;
+  
+  if (y > 0) {
+    scrollToTopButton.className = "btn top-link show";
+  } else {
+    scrollToTopButton.className = "btn top-link hide";
+  }
+};
+
+window.addEventListener("scroll", scrollFunc);
+
+const scrollToTop = () => {
+  const c = document.documentElement.scrollTop || document.body.scrollTop;
+  if (c > 0) {
+    window.requestAnimationFrame(scrollToTop);
+    window.scrollTo(0, c - c / 10);
+  }
+};
+
+scrollToTopButton.onclick = function(e) {
+  e.preventDefault();
+  scrollToTop();
+}

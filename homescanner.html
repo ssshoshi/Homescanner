@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="top">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -49,12 +49,16 @@
       </div>
     </nav>
     <div class="container listings">
-      <div class="d-flex justify-content-center h-100"></div>
-      <div>
+      <div class="columnBtns">
         <div class="btn" id="threeColumn">
-          <i class="fa fa-th"></i>
+          <i class="fa fa-th fa-lg"></i>
         </div>
-        <div class="btn" id="twoColumn"><i class="fa fa-th-large"></i></div>
+        <div class="btn" id="twoColumn">
+          <i class="fa fa-th-large fa-lg"></i>
+        </div>
+        <div class="btn" id="oneColumn">
+          <i class="fa fa-square fa-lg"></i>
+        </div>
       </div>
       <div class="list row"></div>
       <div
@@ -86,6 +90,9 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="btn top-link hide" id="js-top">
+      <i class="fa fa-arrow-up"></i>
     </div>
     <script type="text/javascript" src="dist/js/jquery-3.4.1.min.js"></script>
     <script

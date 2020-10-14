@@ -80,7 +80,7 @@ const renderListing = async (e) => {
           </div>
           <div class="card-body row pb-0 pt-0">
           <div class="col-6 align-self-start mt-2">
-              <a class="h5" id="addrUrl" href="https://zillow.com${e.detailUrl}" target="_blank">
+              <a class="h5 addr" id="addrUrl" href="https://zillow.com${e.detailUrl}" target="_blank">
               ${e.addr + ", " + e.city + ", " + e.state}
               </a>
               <a target="_blank" style="float: right" href="http://googl.com/#q=${e.addr + " " + e.city + " " + e.state}"></a>  

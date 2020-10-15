@@ -1,6 +1,7 @@
 let listingsArr = [];
 let lat1, long1, urlParams, svStatus;
 
+//get coordinates from popup and call fetch
 chrome.storage.local.get("data", (items) => {
   if (!chrome.runtime.error) {
     let latLong = items.data;
@@ -22,18 +23,18 @@ const searchList = () => {
     filter,
     addr,
     results = 0;
-  input = document.getElementById("search");
-  filter = input.value.toUpperCase();
-  list = document.querySelectorAll(".addr");
+    input = document.getElementById("search");
+    filter = input.value.toUpperCase();
+    list = document.querySelectorAll(".addr");
 
-  for (i = 0; i < list.length; i++) {
-    addr = list[i].innerText || list[i].textContent;
+  for (item of list) {
+    addr = item.innerText || item.textContent;
     if (addr.toUpperCase().indexOf(filter) > -1) {
       console.log(filter);
-      list[i].closest(".listing").style.display = "";
+      item.closest(".listing").style.display = "";
       results += 1;
     } else {
-      list[i].closest(".listing").style.display = "none";
+      item.closest(".listing").style.display = "none";
     }
   }
   document.getElementById("resultsNum").innerText = results + " results";
@@ -42,15 +43,16 @@ const searchList = () => {
 // delay on search input
 let input = document.getElementById("search");
 let timeout = null;
-input.addEventListener("keyup", function (e) {
+input.addEventListener("keyup", (e) => {
   clearTimeout(timeout);
-  timeout = setTimeout(function () {
+  timeout = setTimeout(() => {
     searchList();
   }, 500);
 });
 
-function toCamel(string) {
-  return string.toLowerCase().replace(/(?:_| |\b)(\w)/g, function ($1) {
+// camelcase string
+const toCamel = (string) => {
+  return string.toLowerCase().replace(/(?:_| |\b)(\w)/g, ($1) => {
     return $1.toUpperCase().replace("_", " ");
   });
 }
@@ -72,9 +74,8 @@ const renderListing = async (e) => {
               <a class="btn btn-sm btn-light" href="http://googl.com/#q=${e.addr} ${e.city} ${e.state}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
               <a class="btn btn-sm btn-light" href="https://www.whitepages.com/address/${e.addr}/${e.city}-${e.state}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
           </div>
-          <a class="btn btn-sm btn-light expand" data-imgone="https://maps.googleapis.com/maps/api/staticmap?center=${e.lat},${e.long}&zoom=18&size=800x800&maptype=satellite&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI&markers=color:red%7Csize:small%7C${e.lat},${e.long}" data-imgtwo="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
+          <a class="btn btn-sm btn-light expand"  data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
           <div class="toggle">
-              <img src="https://maps.googleapis.com/maps/api/staticmap?center=${e.lat},${e.long}&zoom=19&size=800x800&maptype=satellite&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI&markers=color:red%7Csize:small%7C${e.lat},${e.long}" loading="lazy" class="card-img-top embed-responsive-item map"/>
               <img src="${e.imgSrc}" loading="lazy" class="card-img-top embed-responsive-item"/>
           </div>
           </div>
@@ -102,6 +103,7 @@ const renderListing = async (e) => {
   );
 }
 
+//render skeleton before listing render
 const skeleton = () => {
   for (i=0; i < 6; i++) {
     document.querySelector(".list").insertAdjacentHTML(
@@ -136,18 +138,18 @@ const skeleton = () => {
     );
   }
 }
-
 skeleton();
 
-function hideSkeletons() {
-  var elements = document.getElementsByClassName("skeleton");
-  Array.prototype.forEach.call(elements, function(el) {
+// hide skeletons before listings render
+const hideSkeletons = () => {
+  let elements = document.getElementsByClassName("skeleton");
+  Array.prototype.forEach.call(elements, (el) => {
       el.style.display = "none";
     }
   );
 }
 
-// fetch Zillow map metadata
+// fetch Zillow streetview metadata
 const getStreetViewMeta = async (url) => {
   const fetchResult = fetch(url);
   const response = await fetchResult;
@@ -160,11 +162,11 @@ const getDistance = (lat1, lon1, lat2, lon2, unit) => {
   if (lat1 == lat2 && lon1 == lon2) {
     return 0;
   } else {
-    var radlat1 = (Math.PI * lat1) / 180;
-    var radlat2 = (Math.PI * lat2) / 180;
-    var theta = lon1 - lon2;
-    var radtheta = (Math.PI * theta) / 180;
-    var dist =
+    let radlat1 = (Math.PI * lat1) / 180;
+    let radlat2 = (Math.PI * lat2) / 180;
+    let theta = lon1 - lon2;
+    let radtheta = (Math.PI * theta) / 180;
+    let dist =
       Math.sin(radlat1) * Math.sin(radlat2) +
       Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
     if (dist > 1) {
@@ -193,8 +195,8 @@ const threeColumnRow = () => {
     }
   } else if(listings[0].classList.contains('col-md-12')) {
     for(listing of listings) {
-    listing.classList.remove('col-md-12');
-    listing.classList.add('col-md-4');
+      listing.classList.remove('col-md-12');
+      listing.classList.add('col-md-4');
     }
   }
 }
@@ -208,8 +210,8 @@ const twoColumnRow = () => {
     }
   } else if(listings[0].classList.contains('col-md-12')) {
     for(listing of listings) {
-    listing.classList.remove('col-md-12');
-    listing.classList.add('col-md-6');
+      listing.classList.remove('col-md-12');
+      listing.classList.add('col-md-6');
     }
   }
 }
@@ -222,8 +224,8 @@ const oneColumnRow = () => {
     }
   } else if(listings[0].classList.contains('col-md-4')) {
     for(listing of listings) {
-    listing.classList.remove('col-md-4');
-    listing.classList.add('col-md-12');
+      listing.classList.remove('col-md-4');
+      listing.classList.add('col-md-12');
     }
   }
 }
@@ -235,6 +237,7 @@ const render = async () => {
   }
 };
 
+// convert input coordinates to map boundary coordinates for Zillow url params
 const getMapBoundaries = (lat, long) => {
   const coords = {};
   const x = 0.002743;
@@ -247,6 +250,7 @@ const getMapBoundaries = (lat, long) => {
   return JSON.stringify(coords);
 };
 
+// fetch url and push listings to array
 const getJSON = async () => {
   chrome.runtime.sendMessage({ urlParams: urlParams }, async (response) => {
     let homes = response;
@@ -281,10 +285,7 @@ const getJSON = async () => {
           beds: home.beds ? home.beds : "--",
           baths: home.baths ? home.baths : "--",
           status: home.statusText ? home.statusText : "",
-          imgSrc:
-            home.imgCount > 0
-              ? home.imgSrc
-              : `https://maps.googleapis.com/maps/api/staticmap?center=${home.latLong.latitude},${home.latLong.longitude}&zoom=19&size=600x400&maptype=satellite&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI&markers=color:red%7Csize:small%7C${home.latLong.latitude},${home.latLong.longitude}`,
+          imgSrc: home.imgSrc,
           distance: Math.round(
             getDistance(
               lat1,
@@ -328,9 +329,7 @@ const getJSON = async () => {
       }
     }
 
-
-    
-
+    // wait 2 seconds then render after Promises resolve
     setTimeout(() => {
       hideSkeletons();
       document.querySelector(
@@ -341,43 +340,28 @@ const getJSON = async () => {
       render();
       document.querySelector('.columnBtns').style.display = "flex";
       
-      $(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-      });
-      $(".toggle").click(function () {
-        $(this.childNodes[3]).toggle();
-      });
-      $(".toggleModal").click(function () {
-        $(this.childNodes[3]).toggle();
-        $(this.childNodes[1]).toggle();
-      });
     }, 2000);
   });
 };
 
 //populate modal
-$("#exampleModalCenter").on("show.bs.modal", function (event) {
-  var button = $(event.relatedTarget); // Button that triggered the modal
-  var imgOne = button.data("imgone");
-  var imgTwo = button.data("imgtwo");
-  var modal = $(this);
-  modal.find(".static").attr("src", imgOne);
-  modal.find(".main").attr("src", imgTwo);
+$("#exampleModalCenter").on("show.bs.modal", (event) => {
+  let button = $(event.relatedTarget); // Button that triggered the modal
+  let img = button.data("img");
+  let modal = $(this);
+  modal.find(".main").attr("src", img);
 });
-
-//scroll to top of page
-
 
 document.getElementById('threeColumn').addEventListener("click", threeColumnRow)
 document.getElementById('twoColumn').addEventListener("click", twoColumnRow)
 document.getElementById('oneColumn').addEventListener("click", oneColumnRow)
 
 
+//scroll to top of page
 const scrollToTopButton = document.getElementById('js-top');
 
 const scrollFunc = () => {
   let y = window.scrollY;
-  
   if (y > 0) {
     scrollToTopButton.className = "btn top-link show";
   } else {
@@ -395,7 +379,7 @@ const scrollToTop = () => {
   }
 };
 
-scrollToTopButton.onclick = function(e) {
+scrollToTopButton.onclick = (e) => {
   e.preventDefault();
   scrollToTop();
 }

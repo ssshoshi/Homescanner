@@ -74,7 +74,7 @@ const renderListing = async (e) => {
               <a class="btn btn-sm btn-light" href="http://googl.com/#q=${e.addr} ${e.city} ${e.state}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
               <a class="btn btn-sm btn-light" href="https://www.whitepages.com/address/${e.addr}/${e.city}-${e.state}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
           </div>
-          <a class="btn btn-sm btn-light expand"  data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
+          <a class="btn btn-sm btn-light expand" data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
           <div class="toggle">
               <img src="${e.imgSrc}" loading="lazy" class="card-img-top embed-responsive-item"/>
           </div>
@@ -339,7 +339,6 @@ const getJSON = async () => {
       console.log(listingsArr);
       render();
       document.querySelector('.columnBtns').style.display = "flex";
-      
     }, 2000);
   });
 };
@@ -347,9 +346,8 @@ const getJSON = async () => {
 //populate modal
 $("#exampleModalCenter").on("show.bs.modal", (event) => {
   let button = $(event.relatedTarget); // Button that triggered the modal
-  let img = button.data("img");
-  let modal = $(this);
-  modal.find(".main").attr("src", img);
+  let imgOne = button.data("img");
+  document.querySelector('.main').setAttribute("src", imgOne);
 });
 
 document.getElementById('threeColumn').addEventListener("click", threeColumnRow)

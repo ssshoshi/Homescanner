@@ -339,6 +339,7 @@ const getJSON = async () => {
       console.log(listingsArr);
       render();
       document.querySelector('.columnBtns').style.display = "flex";
+      document.querySelector('#avgHomeValue').innerText = `${avgHomeValue()}`
     }, 2000);
   });
 };
@@ -380,4 +381,17 @@ const scrollToTop = () => {
 scrollToTopButton.onclick = (e) => {
   e.preventDefault();
   scrollToTop();
+}
+
+const avgHomeValue = () => {
+  let total = 0;
+  let totalHomesWithValue = 0;
+  for (listing of listingsArr) {
+    if(listing.price !== "--") {
+      let price = parseInt(listing.price.replace(/\D/g,''));
+      total += price;
+      totalHomesWithValue++;
+    }
+  }
+  return `${parseInt(total/totalHomesWithValue)}K`
 }

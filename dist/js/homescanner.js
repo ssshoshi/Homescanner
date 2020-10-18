@@ -19,18 +19,15 @@ chrome.storage.local.get("data", (items) => {
 
 // Filter listings by address
 const searchList = () => {
-  let input,
-    filter,
-    addr,
-    results = 0;
-    input = document.getElementById("search");
-    filter = input.value.toUpperCase();
-    list = document.querySelectorAll(".addr");
+  let addr,
+      results = 0;
+      input = document.getElementById("search");
+      filter = input.value.toUpperCase();
+      list = document.querySelectorAll(".addr");
 
   for (item of list) {
     addr = item.innerText || item.textContent;
     if (addr.toUpperCase().indexOf(filter) > -1) {
-      console.log(filter);
       item.closest(".listing").style.display = "";
       results += 1;
     } else {
@@ -190,48 +187,22 @@ const getDistance = (lat1, lon1, lat2, lon2, unit) => {
 };
 
 // change column view
-const threeColumnRow = () => {
+const changeColumn = (className) => {
   const listings = document.querySelectorAll('.listing');
-  if(listings[0].classList.contains('col-md-6')) {
+  if(!listings[0].classList.contains(className)) {
     for(listing of listings) {
-      listing.classList.remove('col-md-6');
-      listing.classList.add('col-md-4');
+      if (listing.classList.contains('col-md-6')) {
+        listing.classList.remove('col-md-6');
+        listing.classList.add(className);
+      } else if(listing.classList.contains('col-md-4')) {
+        listing.classList.remove('col-md-4');
+        listing.classList.add(className);
+      } else if(listing.classList.contains('col-md-12')) {
+        listing.classList.remove('col-md-12');
+        listing.classList.add(className);
+      }
     }
-  } else if(listings[0].classList.contains('col-md-12')) {
-    for(listing of listings) {
-      listing.classList.remove('col-md-12');
-      listing.classList.add('col-md-4');
-    }
-  }
-}
-
-const twoColumnRow = () => {
-  const listings = document.querySelectorAll('.listing');
-  if(listings[0].classList.contains('col-md-4')) {
-    for(listing of listings) {
-      listing.classList.remove('col-md-4');
-      listing.classList.add('col-md-6');
-    }
-  } else if(listings[0].classList.contains('col-md-12')) {
-    for(listing of listings) {
-      listing.classList.remove('col-md-12');
-      listing.classList.add('col-md-6');
-    }
-  }
-}
-const oneColumnRow = () => {
-  const listings = document.querySelectorAll('.listing');
-  if(listings[0].classList.contains('col-md-6')) {
-    for(listing of listings) {
-      listing.classList.remove('col-md-6');
-      listing.classList.add('col-md-12');
-    }
-  } else if(listings[0].classList.contains('col-md-4')) {
-    for(listing of listings) {
-      listing.classList.remove('col-md-4');
-      listing.classList.add('col-md-12');
-    }
-  }
+  } 
 }
 
 // render all listings
@@ -357,9 +328,9 @@ $("#exampleModalCenter").on("show.bs.modal", (event) => {
   document.querySelector('.main').setAttribute("src", imgOne);
 });
 
-document.getElementById('threeColumn').addEventListener("click", threeColumnRow)
-document.getElementById('twoColumn').addEventListener("click", twoColumnRow)
-document.getElementById('oneColumn').addEventListener("click", oneColumnRow)
+document.getElementById('threeColumn').addEventListener("click", () => {changeColumn('col-md-4')})
+document.getElementById('twoColumn').addEventListener("click", () => {changeColumn('col-md-6')})
+document.getElementById('oneColumn').addEventListener("click", () => {changeColumn('col-md-12')})
 
 
 //scroll to top of page

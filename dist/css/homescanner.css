@@ -17,8 +17,8 @@
 .card:hover .card-img {
   -webkit-transform: scale(1.2);
           transform: scale(1.2);
-  -webkit-transition: all 0.15s ease-in-out;
-  transition: all 0.15s ease-in-out;
+  -webkit-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out;
 }
 
 nav {
@@ -51,8 +51,8 @@ h2 {
   position: absolute;
   -webkit-transform: scale(1);
           transform: scale(1);
-  -webkit-transition: all 0.15s ease-in-out;
-  transition: all 0.15s ease-in-out;
+  -webkit-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out;
 }
 
 .maplinks {
@@ -243,6 +243,13 @@ div.loading {
 
 .columnBtns .btn {
   margin: 0.5em 0.5em;
+}
+
+.columnBtns .btn:hover {
+  -webkit-transform: scale(1.2);
+          transform: scale(1.2);
+  -webkit-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out;
 }
 
 .top-link {

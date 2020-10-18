@@ -15,17 +15,15 @@
   </head>
   <body>
     <nav
-      class="navbar navbar-expand-md navbar-light bg-light shadow p-3 mb-5 bg-white fixed-top"
+      class="navbar navbar-expand-md navbar-light bg-light shadow bg-white fixed-top"
     >
-      <div
-        class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2"
-      >
+      <div class="navbar-collapse">
         <h2>Home Scanner</h2>
       </div>
 
-      <div class="mx-auto order-0">
+      <div class="ml-4">
         <h6 id="coords" class="mx-auto">Coordinates</h6>
-        <p class="text-center">
+        <p class="text-center mb-0">
           Average home value: <strong id="avgHomeValue"></strong>
         </p>
         <button
@@ -37,23 +35,10 @@
           <span class="navbar-toggler-icon"></span>
         </button>
       </div>
-      <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
-        <ul class="navbar-nav ml-auto">
-          <form class="form-inline my-2 my-lg-0">
-            <h6 id="resultsNum" class="mr-2">-- Results</h6>
-            <input
-              id="search"
-              class="form-control"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-          </form>
-        </ul>
-      </div>
+      <div class="navbar-collapse collapse order-3 dual-collapse2"></div>
     </nav>
-    <div class="container listings">
-      <div class="columnBtns">
+    <nav id="sidebar">
+      <div class="columnBtns d-flex justify-content-center">
         <div class="btn" id="threeColumn">
           <i class="fa fa-th fa-lg"></i>
         </div>
@@ -64,24 +49,42 @@
           <i class="fa fa-square fa-lg"></i>
         </div>
       </div>
+      <form class="form-inline d-flex justify-content-center">
+        <h6 id="resultsNum">-- Results</h6>
+        <input
+          id="search"
+          class="form-control mt-2"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+        />
+      </form>
+    </nav>
+    <div class="container-fluid listings">
       <div class="list row"></div>
+      <div
+        class="modal fade"
+        id="exampleModalCenter"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true"
+      >
+        <div
+          class="modal-dialog modal-dialog-centered modal-lg"
+          role="document"
+        >
+          <div class="modal-body">
+            <img
+              loading="lazy"
+              class="main card-img-top embed-responsive-item"
+            />
+          </div>
+        </div>
+      </div>
     </div>
     <div class="btn top-link hide" id="js-top">
       <i class="fa fa-arrow-up"></i>
-    </div>
-    <div
-      class="modal fade"
-      id="exampleModalCenter"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-body">
-          <img loading="lazy" class="main card-img-top embed-responsive-item" />
-        </div>
-      </div>
     </div>
     <script type="text/javascript" src="dist/js/jquery-3.4.1.min.js"></script>
     <script

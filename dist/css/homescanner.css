@@ -71,7 +71,10 @@ h2 {
 }
 
 .listings {
-  margin-top: 10rem;
+  position: absolute;
+  width: calc(100% - 250px);
+  right: 0;
+  padding: 100px;
 }
 
 .streetview {
@@ -145,6 +148,11 @@ h2 {
 .modal-body {
   padding: 0;
   bottom: 33vh;
+}
+
+.modal {
+  padding-right: 0px !important;
+  padding-left: 250px !important;
 }
 
 img {
@@ -228,14 +236,11 @@ div.loading {
 }
 
 .columnBtns {
-  display: none;
-  flex-direction: column;
-  position: fixed;
+  flex-direction: row;
   left: 0;
-  z-index: 999;
 }
 .columnBtns .btn {
-  margin: 0.5em 1em;
+  margin: 0.5em 0.5em;
 }
 
 .top-link {
@@ -262,4 +267,25 @@ div.loading {
 .top-link.hide {
   visibility: hidden;
   opacity: 0;
+}
+
+.card,
+.card-img-top {
+  border-radius: 0px !important;
+}
+
+.btn {
+  border-radius: 0px !important;
+}
+
+#sidebar {
+  padding-top: 90px;
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 999;
+  background: white;
+  transition: all 0.3s;
 }

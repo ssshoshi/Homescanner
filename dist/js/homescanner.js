@@ -338,8 +338,10 @@ const getJSON = async () => {
       listingsArr.sort((a, b) => a.distance - b.distance);
       console.log(listingsArr);
       render();
-      document.querySelector('.columnBtns').style.display = "flex";
       document.querySelector('#avgHomeValue').innerText = `${avgHomeValue()}`
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
     }, 2000);
   });
 };
@@ -393,5 +395,5 @@ const avgHomeValue = () => {
       totalHomesWithValue++;
     }
   }
-  return `${parseInt(total/totalHomesWithValue)}K`
+  return `$${parseInt(total/totalHomesWithValue)}K`
 }

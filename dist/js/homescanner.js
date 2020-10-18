@@ -42,6 +42,10 @@ const searchList = () => {
 
 // delay on search input
 let input = document.getElementById("search");
+input.addEventListener("search", (e) => {
+  e.preventDefault();
+  searchList();
+})
 let timeout = null;
 input.addEventListener("keyup", (e) => {
   clearTimeout(timeout);
@@ -63,7 +67,7 @@ const renderListing = async (e) => {
     "beforeend",
     `
   <div class="col-md-6 mb-2 listing">
-      <div class="card mb-2 h-100 hovernow">
+      <div class="card mb-2 h-100">
           <div class="embed-responsive embed-responsive-16by9">
           <div class="maplinks">
               <a class="btn btn-sm btn-light" href="http://maps.google.com/maps?t=k&q=loc:${e.lat}+${e.long}" target="_blank">Google Map</a>
@@ -76,7 +80,7 @@ const renderListing = async (e) => {
           </div>
           <a class="btn btn-sm btn-light expand" data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
           <div class="toggle">
-              <img src="${e.imgSrc}" loading="lazy" class="card-img-top embed-responsive-item"/>
+              <img src="${e.imgSrc}" loading="lazy" class="card-img embed-responsive-item"/>
           </div>
           </div>
           <div class="card-body row pb-0 pt-0">
@@ -300,7 +304,7 @@ const getJSON = async () => {
           house.addr
         )}+${encodeURIComponent(
           house.city
-        )}&size=800x800&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
+        )}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
         let metaDataOne = getStreetViewMeta(addrStreetview);
         let metaDataTwo;
 
@@ -314,13 +318,13 @@ const getJSON = async () => {
                 house.addr
               )}+${encodeURIComponent(
                 house.city
-              )}&size=800x800&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
+              )}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
             }
           } else if (val.status !== "OK") {
             metaDataTwo = getStreetViewMeta(home.streetViewMetadataURL);
             Promise.resolve(metaDataTwo).then((value) => {
               if (value.status === "OK") {
-                house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${home.latLong.latitude},${home.latLong.longitude}&size=800x800&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
+                house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${home.latLong.latitude},${home.latLong.longitude}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
               }
             });
           }

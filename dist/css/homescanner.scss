@@ -1,9 +1,28 @@
-.embed-responsive .card-img-top {
+$primary: #006aff;
+@mixin card-buttons() {
+  position: absolute;
+  z-index: 2;
+  bottom: 5px;
+}
+
+.embed-responsive .card-img {
   object-fit: cover;
 }
 
+.card {
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 10px 0px;
+  border-bottom: 3px solid $primary;
+  &:hover {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  }
+  &:hover .card-img {
+    transform: scale(1.2);
+    transition: all 0.15s ease-in-out;
+  }
+}
+
 nav {
-  border-bottom: 1px solid rgb(0, 106, 255);
+  border-bottom: 1px solid $primary;
 }
 
 #coords,
@@ -11,12 +30,16 @@ nav {
   margin-bottom: 0rem !important;
 }
 
+#avgHomeValue {
+  text-align: center;
+}
+
 #coords {
   white-space: nowrap;
 }
 
 h2 {
-  color: rgb(0, 106, 255) !important;
+  color: $primary !important;
   font-weight: bold !important;
 }
 
@@ -24,30 +47,19 @@ h2 {
   text-transform: capitalize;
 }
 
-.hovernow {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-}
-
-.hovernow:hover {
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
-}
-
-.card-img-top {
+.card-img {
   position: absolute;
-  z-index: 1;
+  transform: scale(1);
+  transition: all 0.15s ease-in-out;
 }
 
 .maplinks {
-  position: absolute;
-  z-index: 2;
-  bottom: 5px;
+  @include card-buttons;
   left: 5px;
 }
 
 .otherLinks {
-  position: absolute;
-  z-index: 2;
-  bottom: 5px;
+  @include card-buttons;
   right: 5px;
 }
 
@@ -58,76 +70,53 @@ h2 {
   right: 5px;
 }
 
-.listing {
+.listing,
+.skeleton {
   padding: 5px;
 }
 
 .listings {
-  margin-top: 10rem;
-}
-
-.streetview {
   position: absolute;
-  z-index: 2;
-  top: 5px;
-  right: 5px;
+  width: calc(100% - 250px);
+  right: 0;
+  padding: 100px;
 }
 
-.zoom {
-  position: absolute;
-  z-index: 2;
-  top: 5px;
-  right: 5px;
-}
-
-.center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-}
-
-.hovernow {
-  border-bottom: 3px solid rgb(0, 106, 255);
+.skBorder {
+  border-bottom: 3px solid #b6b6b6;
 }
 
 .tooltip-inner {
-  background: rgb(0, 106, 255);
+  background: $primary;
   color: white;
-  border: 1px solid rgb(0, 106, 255);
+  border: 1px solid $primary;
 }
 
-.bs-tooltip-auto[x-placement^="bottom"] .arrow::before,
-.bs-tooltip-bottom .arrow::before {
-  border-bottom-color: #f00;
-  /* Red */
+.fa {
+  color: $primary;
 }
 
-.fa,
 .btn {
-  color: rgb(0, 106, 255);
-}
-
-.btn:hover {
-  color: white;
-  background-color: rgb(0, 106, 255);
-  border: rgb(0, 106, 255) solid 1px;
-}
-
-.btn:hover i {
-  color: white;
-}
-
-.btn:active {
-  color: rgb(0, 106, 255);
+  color: $primary;
+  &:hover {
+    color: white;
+    background-color: $primary;
+    border: $primary solid 1px;
+  }
+  &:hover i {
+    color: white;
+  }
+  &:active {
+    color: $primary;
+  }
 }
 
 .spinner-border {
-  color: rgb(0, 106, 255);
+  color: $primary;
 }
 
 #search {
-  border: 1px solid rgb(0, 106, 255);
+  border: 1px solid $primary;
 }
 
 .modal-body {
@@ -135,79 +124,18 @@ h2 {
   bottom: 33vh;
 }
 
+.modal {
+  padding-right: 0px !important;
+  padding-left: 250px !important;
+}
+
 img {
   position: absolute;
 }
 
-$border-color: #dae1e7;
-$background-color: #f4f4f4;
-$text-color: #333;
-
-body {
-  background: $background-color;
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-    Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue;
-  color: $text-color;
-}
-
-.container {
-  margin: 2rem auto;
-  max-width: 800px;
-  display: flex;
-  justify-content: center;
-}
-
-.card {
-  overflow: hidden;
-  background: white;
-  border-radius: 0.25rem;
-  max-width: 380px;
-  width: 380px;
-  box-shadow: 0 15px 30px 0 rgba(0, 0, 0, 0.05),
-    0 5px 15px 0 rgba(0, 0, 0, 0.05);
-  transition: ease box-shadow 0.3s;
-  &:hover {
-    box-shadow: 0 15px 60px 0 rgba(0, 0, 0, 0.08),
-      0 5px 25px 0 rgba(0, 0, 0, 0.08);
-  }
-}
-
-.card-detail {
-  padding: 0.5rem 1rem;
-
-  h3 {
-    font-size: 1.5rem;
-    margin-bottom: none;
-    line-height: 0.09;
-  }
-
-  p {
-    line-height: 1.3rem;
-  }
-}
-
-.card-image {
-  margin: 0;
-  padding: 0;
-  height: 200px;
-  overflow: hidden;
-
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-}
-
 .loading {
-  position: relative;
   background-color: #e2e2e2;
-
-  &.card-image {
-    border-radius: 0;
-  }
-
+  color: #e2e2e2;
   &::after {
     display: block;
     content: "";
@@ -225,21 +153,110 @@ body {
   }
 }
 
+p.loading,
+div.loading {
+  height: 1.5rem;
+  margin-top: 1px;
+}
+
+.skAddr {
+  width: 75%;
+}
+.skAddr2 {
+  width: 45%;
+}
+.skType {
+  width: 37%;
+}
+.skPrice {
+  width: 42%;
+}
+.skGeo {
+  width: 60%;
+}
+
+.skImgs {
+  width: 25%;
+}
+.skSqft {
+  width: 32%;
+}
+.skBa {
+  width: 32%;
+}
+.skDist {
+  width: 32%;
+}
+.skStatus {
+  width: 60%;
+}
+
 @keyframes loading {
   100% {
     transform: translateX(100%);
   }
 }
 
-.card-title.loading {
-  height: 1.8rem;
+#oneColumn,
+#twoColumn,
+#threeColumn {
+  background-color: #e2e2e2;
+  &:hover {
+    background-color: $primary;
+  }
 }
 
-.card-image.image {
-  max-width: 100%;
-  height: auto;
+.columnBtns {
+  flex-direction: row;
+  left: 0;
+  .btn {
+    margin: 0.5em 0.5em;
+  }
 }
 
-.card-description.loading {
-  height: 80px;
+.top-link {
+  transition: all 0.25s ease-in-out;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  display: inline-flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  margin: 0 1em 1em 0;
+  padding: 0.25em;
+  width: 50px;
+  height: 50px;
+  background-color: #e2e2e2;
+  z-index: 999;
+}
+
+.top-link.show {
+  visibility: visible;
+  opacity: 1;
+}
+.top-link.hide {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.card,
+.card-img {
+  border-radius: 0px !important;
+}
+
+.btn {
+  border-radius: 0px !important;
+}
+
+#sidebar {
+  padding-top: 90px;
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 999;
+  background: white;
+  transition: all 0.3s;
 }

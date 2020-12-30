@@ -6,7 +6,8 @@
 .card {
   -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 10px 0px;
           box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 10px 0px;
-  border-bottom: 3px solid #006aff;
+  border: 0 !important;
+  border-bottom: 3px solid #006aff !important;
 }
 
 .card:hover {

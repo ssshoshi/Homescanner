@@ -13,9 +13,9 @@
   "permissions": ["storage"],
   "content_scripts": [
     {
-      "matches": ["*://*/homescanner.html"],
-      "css": ["/dist/css/homescanner.css"],
-      "js": ["/dist/js/homescanner.js"]
+      "matches": ["https://www.zillow.com/homescanner/"],
+      "css": ["/dist/css/homescanner.css", "/dist/css/bootstrap.min.css"],
+      "js": ["/dist/js/homescanner.js", "dist/js/jquery-3.4.1.min.js"]
     },
     {
       "matches": [
@@ -31,6 +31,12 @@
       "matches": ["*://*/popup.html"],
       "js": ["/dist/js/popup.js"]
     }
+  ],
+  "web_accessible_resources": [
+    "homescanner.html",
+    "/dist/css/homescanner.css",
+    "/dist/js/homescanner.js",
+    "/dist/css/bootstrap.min.css"
   ],
   "browser_action": {
     "default_popup": "popup.html",

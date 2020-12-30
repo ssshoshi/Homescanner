@@ -1,5 +1,40 @@
+
 let listingsArr = [];
-let lat1, long1, urlParams, svStatus;
+let lat1, long1, urlParams, svStatus, zData;
+window.onload = function() {
+  fetch(chrome.extension.getURL('/homescanner.html'))
+    .then(response => response.text())
+    .then(data => {
+        document.querySelector('body').innerHTML = data;
+        chrome.storage.local.get("data", (items) => {
+          if (!chrome.runtime.error) {
+            let latLong = items.data;
+            let coords = latLong.replace(/\s/g, "").split(",");
+            document.querySelector("#coords").innerText = latLong;
+            lat1 = parseFloat(coords[0]);
+            long1 = parseFloat(coords[1]);
+            urlParams = `{"pagination":{},"mapBounds":${getMapBoundaries(
+              lat1,
+              long1
+            )},"isMapVisible":true,"mapZoom":19}`;
+          }
+            getJSON();
+        });
+    }).catch(err => {
+        // handle error
+    });
+
+    $(document).ready(function() {
+      var path = chrome.extension.getURL('css/homescanner.css');
+      var path2 = chrome.extension.getURL('css/bootstrap.min.css')
+      $('head').append($('<link>').attr("rel","stylesheet").attr("type","text/css").attr("href", chrome.runtime.getURL('css/bootstrap.css')));
+      $('head').append($('<link>').attr("rel","stylesheet").attr("type","text/css").attr("href", chrome.runtime.getURL('css/homescanner.css')));
+    });
+    
+  };
+
+
+
 
 //get coordinates from popup and call fetch
 chrome.storage.local.get("data", (items) => {
@@ -14,7 +49,6 @@ chrome.storage.local.get("data", (items) => {
       long1
     )},"isMapVisible":true,"mapZoom":19}`;
   }
-  getJSON();
 });
 
 // Filter listings by address
@@ -227,31 +261,27 @@ const getMapBoundaries = (lat, long) => {
 
 // fetch url and push listings to array
 const getJSON = async () => {
-  chrome.runtime.sendMessage({ urlParams: urlParams }, async (response) => {
-    let homes = response;
+    var url =
+        "https://www.zillow.com/search/GetSearchPageState.htm?searchQueryState=" +
+        encodeURIComponent(urlParams);
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => zData = data.searchResults.mapResults)
+        .catch((error) => console.log(error));
+    let homes = zData;
     console.log(homes);
     for (let home of homes) {
       if (home.zpid || home.buildingId) {
         let house = {
           pano_id: null,
-          addr: home.buildingId
-            ? home.detailUrl.split("/")[2].replace(/-/g, " ")
-            : home.hdpData.homeInfo.streetAddress,
-          city: home.hasOwnProperty("hdpData")
-            ? home.hdpData.homeInfo.city
-            : "--",
-          state: home.hasOwnProperty("hdpData")
-            ? home.hdpData.homeInfo.state
-            : "--",
-          zipcode: home.hasOwnProperty("hdpData")
-            ? home.hdpData.homeInfo.zipcode
-            : "--",
+          addr: home.buildingId ? home.detailUrl.split("/")[2].replace(/-/g, " ") : home.hdpData.homeInfo.streetAddress,
+          city: home.hasOwnProperty("hdpData") ? home.hdpData.homeInfo.city : "--",
+          state: home.hasOwnProperty("hdpData") ? home.hdpData.homeInfo.state : "--",
+          zipcode: home.hasOwnProperty("hdpData") ? home.hdpData.homeInfo.zipcode : "--",
           streetViewURL: home.streetViewURL,
           streetViewMetadataURL: home.streetViewMetadataURL,
           detailUrl: home.detailUrl,
-          homeType: home.buildingId
-            ? "APARTMENT"
-            : home.hdpData.homeInfo.homeType,
+          homeType: home.buildingId ? "APARTMENT" : home.hdpData.homeInfo.homeType,
           lat: home.latLong.latitude,
           long: home.latLong.longitude,
           imgCount: home.imgCount,
@@ -318,7 +348,6 @@ const getJSON = async () => {
         $('[data-toggle="tooltip"]').tooltip()
       })
     }, 2000);
-  });
 };
 
 //populate modal
@@ -360,6 +389,7 @@ scrollToTopButton.onclick = (e) => {
   scrollToTop();
 }
 
+// average home value
 const avgHomeValue = () => {
   let total = 0;
   let totalHomesWithValue = 0;

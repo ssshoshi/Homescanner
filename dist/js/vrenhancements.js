@@ -29,7 +29,7 @@ setTimeout(() => {
   const coord = document.querySelector("ng-map").getAttribute("center");
   const map = document.querySelector(".map-container");
   const title = document.querySelectorAll(".md-headline")[2];
-  const searchTerm = `"${encodeURIComponent(title.innerText)}"`;
+  const searchTerm = encodeURIComponent(title.innerText);
   const list = document.querySelectorAll(
     '[ng-if="vm.listing.duplicate_listings.length"]'
   )[0];

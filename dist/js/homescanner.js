@@ -1,40 +1,5 @@
-
 let listingsArr = [];
-let lat1, long1, urlParams, svStatus, zData;
-window.onload = function() {
-  fetch(chrome.extension.getURL('/homescanner.html'))
-    .then(response => response.text())
-    .then(data => {
-        document.querySelector('body').innerHTML = data;
-        chrome.storage.local.get("data", (items) => {
-          if (!chrome.runtime.error) {
-            let latLong = items.data;
-            let coords = latLong.replace(/\s/g, "").split(",");
-            document.querySelector("#coords").innerText = latLong;
-            lat1 = parseFloat(coords[0]);
-            long1 = parseFloat(coords[1]);
-            urlParams = `{"pagination":{},"mapBounds":${getMapBoundaries(
-              lat1,
-              long1
-            )},"isMapVisible":true,"mapZoom":19}`;
-          }
-            getJSON();
-        });
-    }).catch(err => {
-        // handle error
-    });
-
-    $(document).ready(function() {
-      var path = chrome.extension.getURL('css/homescanner.css');
-      var path2 = chrome.extension.getURL('css/bootstrap.min.css')
-      $('head').append($('<link>').attr("rel","stylesheet").attr("type","text/css").attr("href", chrome.runtime.getURL('css/bootstrap.css')));
-      $('head').append($('<link>').attr("rel","stylesheet").attr("type","text/css").attr("href", chrome.runtime.getURL('css/homescanner.css')));
-    });
-    
-  };
-
-
-
+let lat1, long1, urlParams, svStatus;
 
 //get coordinates from popup and call fetch
 chrome.storage.local.get("data", (items) => {
@@ -47,8 +12,9 @@ chrome.storage.local.get("data", (items) => {
     urlParams = `{"pagination":{},"mapBounds":${getMapBoundaries(
       lat1,
       long1
-    )},"isMapVisible":true,"mapZoom":19}`;
+    )},"isMapVisible":true,"filterState":{"isAllHomes":{"value":true}},"mapZoom":18}&wants={"cat1":["listResults","mapResults"]}`;
   }
+  getJSON();
 });
 
 // Filter listings by address
@@ -106,8 +72,8 @@ const renderListing = async (e) => {
           </div>
           <div class="otherLinks">
               <a class="btn btn-sm btn-light" href="https://www.google.com/maps/@?api=1&map_action=pano&pano=${e.pano_id}&viewpoint=${e.svLat},${e.svLng}" target="_blank" data-toggle="tooltip" data-placement="top" title="Streetview"><i class="fa fa-street-view"></i></a>
-              <a class="btn btn-sm btn-light" href="http://googl.com/#q=${e.addr} ${e.city} ${e.state}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
-              <a class="btn btn-sm btn-light" href="https://www.whitepages.com/address/${e.addr}/${e.city}-${e.state}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
+              <a class="btn btn-sm btn-light" href="https://www.google.com/search?q=${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
+              <a class="btn btn-sm btn-light" href="https://www.whitepages.com/address/${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
           </div>
           <a class="btn btn-sm btn-light expand" data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
           <div class="toggle">
@@ -117,15 +83,14 @@ const renderListing = async (e) => {
           <div class="card-body row pb-0 pt-0">
           <div class="col-6 align-self-start mt-2">
               <a class="h5 addr" id="addrUrl" href="https://zillow.com${e.detailUrl}" target="_blank">
-              ${e.addr + ", " + e.city + ", " + e.state}
+              ${e.addr}
               </a>
-              <a target="_blank" style="float: right" href="http://googl.com/#q=${e.addr + " " + e.city + " " + e.state}"></a>  
+              <a target="_blank" style="float: right" href="https://www.google.com/search?q=${e.addr}"></a>  
               <p class="mb-0 type">${toCamel(e.homeType)}</p>
               <p class="mb-0">${e.price} Assessed</p>
               <p class="mb-0 geo">${e.lat}, ${e.long}</p>
           </div>
           <div class="col-6 text-right align-self-start mt-2">
-              <div><strong>${e.imgCount} </strong>imgs</div>
               <div><strong>${e.sqft}</strong> sqft</div>
               <div><strong>${e.beds}</strong> bd <strong class="font-weight-bold">${e.baths}</strong> ba</div>
               <div><strong>${e.distance}</strong>m away</div>
@@ -160,7 +125,6 @@ const skeleton = () => {
                 <p class="mb-0 skGeo loading"></p>
             </div>
             <div class="col-6 d-flex align-items-end flex-column mt-2 ">
-                <div class="loading skImgs"></div>
                 <div class="loading skSqft"></div>
                 <div class="loading skBa"></div>
                 <div class="loading skDist"></div>
@@ -261,30 +225,31 @@ const getMapBoundaries = (lat, long) => {
 
 // fetch url and push listings to array
 const getJSON = async () => {
-    var url =
-        "https://www.zillow.com/search/GetSearchPageState.htm?searchQueryState=" +
-        encodeURIComponent(urlParams);
-      fetch(url)
-        .then((response) => response.json())
-        .then((data) => zData = data.searchResults.mapResults)
-        .catch((error) => console.log(error));
-    let homes = zData;
+  chrome.runtime.sendMessage({ urlParams: urlParams }, async (response) => {
+    let homes = response;
     console.log(homes);
     for (let home of homes) {
       if (home.zpid || home.buildingId) {
         let house = {
           pano_id: null,
-          addr: home.buildingId ? home.detailUrl.split("/")[2].replace(/-/g, " ") : home.hdpData.homeInfo.streetAddress,
-          city: home.hasOwnProperty("hdpData") ? home.hdpData.homeInfo.city : "--",
-          state: home.hasOwnProperty("hdpData") ? home.hdpData.homeInfo.state : "--",
-          zipcode: home.hasOwnProperty("hdpData") ? home.hdpData.homeInfo.zipcode : "--",
+          addr: home.detailUrl.split("/")[2].replace(/-/g, " "),
+          city: home.hasOwnProperty("hdpData")
+            ? home.hdpData.homeInfo.city
+            : "--",
+          state: home.hasOwnProperty("hdpData")
+            ? home.hdpData.homeInfo.state
+            : "--",
+          zipcode: home.hasOwnProperty("hdpData")
+            ? home.hdpData.homeInfo.zipcode
+            : "--",
           streetViewURL: home.streetViewURL,
           streetViewMetadataURL: home.streetViewMetadataURL,
           detailUrl: home.detailUrl,
-          homeType: home.buildingId ? "APARTMENT" : home.hdpData.homeInfo.homeType,
+          homeType: home.buildingId
+            ? "APARTMENT"
+            : home.hdpData.homeInfo.homeType,
           lat: home.latLong.latitude,
           long: home.latLong.longitude,
-          imgCount: home.imgCount,
           price: home.priceLabel ? home.priceLabel : "--",
           sqft: home.area ? home.area : "--",
           beds: home.beds ? home.beds : "--",
@@ -348,6 +313,7 @@ const getJSON = async () => {
         $('[data-toggle="tooltip"]').tooltip()
       })
     }, 2000);
+  });
 };
 
 //populate modal
@@ -389,7 +355,6 @@ scrollToTopButton.onclick = (e) => {
   scrollToTop();
 }
 
-// average home value
 const avgHomeValue = () => {
   let total = 0;
   let totalHomesWithValue = 0;

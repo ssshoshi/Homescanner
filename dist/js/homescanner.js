@@ -268,8 +268,6 @@ const getJSON = async () => {
         };
         let addrStreetview = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${encodeURIComponent(
           house.addr
-        )}+${encodeURIComponent(
-          house.city
         )}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
         let metaDataOne = getStreetViewMeta(addrStreetview);
         let metaDataTwo;
@@ -279,13 +277,9 @@ const getJSON = async () => {
             house.pano_id = val.pano_id;
             house.svLat = val.location.lat;
             house.svLng = val.location.lng;
-            if (house.imgCount === 0) {
               house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${encodeURIComponent(
                 house.addr
-              )}+${encodeURIComponent(
-                house.city
               )}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
-            }
           } else if (val.status !== "OK") {
             metaDataTwo = getStreetViewMeta(home.streetViewMetadataURL);
             Promise.resolve(metaDataTwo).then((value) => {

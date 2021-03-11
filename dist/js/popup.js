@@ -13,8 +13,8 @@ const checkCoords = (lat, lon) => {
 
 document.querySelector(".btn").onclick = function (e) {
   var d = document.querySelector("#coords").value;
-  let latLong = d.split(/,\s+/);
-  if (checkCoords(latLong[0], latLong[1])) {
+  let latLong = d.split(/,/);
+  if (checkCoords(latLong[0].trim(), latLong[1].trim())) {
     chrome.storage.local.set({ data: d }, function () {
       if (chrome.runtime.error) {
         console.log("Runtime error.");
@@ -27,8 +27,8 @@ document.querySelector(".btn").onclick = function (e) {
 
 const enter = document.querySelector("#enter");
 const input = document.querySelector("#coords");
-coords.addEventListener("keypress", (e) => {
-  if (input.length > e.key === "Enter") {
+input.addEventListener("keydown", (e) => {
+  if (input.value.length > 0 && e.key === "Enter") {
     enter.click();
   }
 });

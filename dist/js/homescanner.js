@@ -232,7 +232,7 @@ const getJSON = async () => {
       if (home.zpid || home.buildingId) {
         let house = {
           pano_id: null,
-          addr: home.detailUrl.split("/")[2].replace(/-/g, " "),
+          addr: home.address !== "--" ? home.address : home.detailUrl.split("/")[2].replace(/-/g, " "),
           city: home.hasOwnProperty("hdpData")
             ? home.hdpData.homeInfo.city
             : "--",

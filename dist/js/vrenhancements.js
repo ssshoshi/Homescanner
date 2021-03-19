@@ -26,7 +26,7 @@ if (
 }
 
 setTimeout(() => {
-  const coord = document.querySelector("ng-map").getAttribute("center");
+  const coord = document.querySelector("ng-map").getAttribute("center").split(/,/);
   const map = document.querySelector(".map-container");
   const title = document.querySelectorAll(".md-headline")[2];
   const searchTerm = encodeURIComponent(title.innerText);

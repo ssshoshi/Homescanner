@@ -5,8 +5,8 @@ let lat1, long1, urlParams, svStatus;
 chrome.storage.local.get("data", (items) => {
   if (!chrome.runtime.error) {
     let latLong = items.data;
-    let coords = latLong.replace(/\s/g, "").split(",");
-    document.querySelector("#coords").innerText = latLong;
+    let coords = latLong
+    document.querySelector("#coords").innerText = `${latLong[0]}, ${latLong[1]}`;
     lat1 = parseFloat(coords[0]);
     long1 = parseFloat(coords[1]);
     urlParams = `{"pagination":{},"mapBounds":${getMapBoundaries(
@@ -353,11 +353,15 @@ const avgHomeValue = () => {
   let total = 0;
   let totalHomesWithValue = 0;
   for (listing of listingsArr) {
-    if(listing.price !== "--") {
+    if(listing.price.localeCompare("--") !== 0 && listing.price.localeCompare("$--") !== 0) {
       let price = parseInt(listing.price.replace(/\D/g,''));
       total += price;
+      console.log(price)
       totalHomesWithValue++;
     }
+    console.log(total)
   }
-  return `$${parseInt(total/totalHomesWithValue)}K`
+  let average = parseInt(total/totalHomesWithValue)
+  console.log(average)
+  return `$${average}K`
 }

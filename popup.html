@@ -4,11 +4,14 @@
     <link rel="stylesheet" href="/dist/css/bootstrap.min.css" />
   </head>
   <body class="bg-dark">
-    <div class="container mt-2 "></div>
+    <div class="container m-1 mb-2 d-flex flex-column">
       <h2 class="text-center" style="color:#006aff">Home Scanner</h2>
-      <p class="text-center text-light">Search Coordinates</p>
-      <input id="coords" class="text-center mb-1" placeholder="Latitude, Longitude" required></input>
-      <a class="btn btn-primary w-100" id="enter" target="_blank" href="/homescanner.html">Search</a>
+      <p class="text-center text-light" id="error">Search Coordinates</p>
+      <input id="coords" class="text-center mb-2" placeholder="Latitude, Longitude" required>
+      <div class="d-flex justify-content-center">
+        <a class="btn btn-primary w-100 mb-2" id="enter" target="_blank">Search</a>
+      </div>
+
     </div>
     <script type="text/javascript" src="/dist/js/popup.js"></script>
   </body>

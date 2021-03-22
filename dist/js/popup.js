@@ -12,30 +12,36 @@ const verifyCoords = (lat, lon) => {
 };
 
 const inputIsCoords = (latLong) => {
-  console.log(latLong)
-  if (verifyCoords(latLong[0].trim(), latLong[1].trim())) {
-    chrome.storage.local.set({ data: latLong }, function () {
-      if (chrome.runtime.error) {
-        console.log("Runtime error.");
-      }
-      window.open("/homescanner.html");
-    });
+  if(latLong.includes(",")) {
+    let coords = latLong.split(/,/);
+
+    let lat = coords[0].trim();
+    let long = coords[1].trim();
+
+    if (verifyCoords(lat, long)) {
+      chrome.storage.local.set({ data: coords }, function () {
+        if (chrome.runtime.error) {
+          console.log("Runtime error.");
+        }
+        window.open("/homescanner.html");
+      });
+    } else {
+      document.querySelector("#error").textContent = "Input must be coordinates e.g. 47.595152, -122.331639"
+    }
   } else {
     document.querySelector("#error").textContent = "Input must be coordinates e.g. 47.595152, -122.331639"
   }
 }
 
 document.querySelector("#coords").addEventListener("keydown", (e) => {
-  let d = document.querySelector("#coords").value;
-  let latLong = d.split(/,/);
   if(e.key === "Enter") {
+    let latLong = document.querySelector("#coords").value;
     inputIsCoords(latLong)
   }
 });
 
 document.querySelector("#enter").addEventListener("click", () => {
-  let d = document.querySelector("#coords").value;
-  let latLong = d.split(/,/);
+  let latLong = document.querySelector("#coords").value;
   inputIsCoords(latLong)
 });
 

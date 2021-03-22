@@ -15,3 +15,18 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     chrome.tabs.create({ url: "/homescanner.html" });
   }
 });
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  var url =
+    "https://www.realtor.com/realestateandhomes-detail/2722-Vicente-St_San-Francisco_CA_94116_M27132-12140"
+    console.log(url);
+  let images;
+  fetch(url)
+    .then((response) => response.text())
+    .then((data) => {
+      console.log(data)
+    })
+    .catch((error) => console.log(error));
+
+  return true;
+});

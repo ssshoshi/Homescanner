@@ -1,3 +1,5 @@
+document.querySelector("#coords").focus()
+
 const verifyCoords = (lat, lon) => {
   ck_lat = /^(-?[1-8]?\d(?:\.\d{1,18})?|90(?:\.0{1,18})?)$/;
   ck_lon = /^(-?(?:1[0-7]|[1-9])?\d(?:\.\d{1,18})?|180(?:\.0{1,18})?)$/;

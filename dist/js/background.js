@@ -17,16 +17,20 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 });
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  var url =
-    "https://www.realtor.com/realestateandhomes-detail/2722-Vicente-St_San-Francisco_CA_94116_M27132-12140"
-    console.log(url);
-  let images;
-  fetch(url)
-    .then((response) => response.text())
-    .then((data) => {
-      console.log(data)
-    })
-    .catch((error) => console.log(error));
+  if(request.realtorID) {
+    var url =
+      "https://www.realtor.com/realestateandhomes-detail/M" + request.realtorID
+      // console.log(request.realtorID);
+    fetch(url)
+      .then((response) => response.text())
+      .then((data) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data, "text/html");
 
-  return true;
+        sendResponse(doc.getElementsByClassName("leadform-bgimg")[0].src)
+      })
+      .catch((error) => console.log(error));
+
+    return true;
+  }
 });

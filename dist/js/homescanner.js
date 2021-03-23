@@ -1,5 +1,5 @@
 let listingsArr = [];
-let lat1, long1, urlParams, svStatus;
+let lat1, long1, urlParams;
 
 //get coordinates from popup and call fetch
 chrome.storage.local.get("data", (items) => {
@@ -71,9 +71,20 @@ const renderListing = async (e) => {
               <a class="btn btn-sm btn-light" href="https://www.bing.com/maps?where1=${e.lat},${e.long}&style=h&lvl=18" target="_blank">Bing Map</a>
           </div>
           <div class="otherLinks">
-              <a class="btn btn-sm btn-light" href="https://www.google.com/maps/@?api=1&map_action=pano&pano=${e.pano_id}&viewpoint=${e.svLat},${e.svLng}" target="_blank" data-toggle="tooltip" data-placement="top" title="Streetview"><i class="fa fa-street-view"></i></a>
+          ${
+            e.svStatus === "OK" ?
+              `<a class="btn btn-sm btn-light" href="https://www.google.com/maps/@?api=1&map_action=pano&pano=${e.pano_id}&viewpoint=${e.svLat},${e.svLng}" target="_blank" data-toggle="tooltip" data-placement="top" title="Streetview"><i class="fa fa-street-view"></i></a>`
+            :
+              `<a class="btn btn-sm btn-secondary disabled" data-toggle="tooltip" data-placement="top" title="No Streetview"><i class="fa fa-street-view"></i></a>`
+
+          }
               <a class="btn btn-sm btn-light" href="https://www.google.com/search?q=${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
               <a class="btn btn-sm btn-light" href="https://www.whitepages.com/address/${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
+              ${
+                !e.realtorImage ? `<a class="btn btn-sm btn-light" href="https://www.realtor.com/realestateandhomes-detail/M${e.realtorLink}" target="_blank" data-toggle="tooltip" data-placement="top" title="Realtor">R</a>`
+                : `<a class="btn btn-sm btn-light" href="https://zillow.com${e.detailUrl}" target="_blank" data-toggle="tooltip" data-placement="top" title="Zillow">Z</a>`
+
+              }
           </div>
           <a class="btn btn-sm btn-light expand" data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
           <div class="toggle">
@@ -82,9 +93,11 @@ const renderListing = async (e) => {
           </div>
           <div class="card-body row pb-0 pt-0">
           <div class="col-6 align-self-start mt-2">
-              <a class="h5 addr" id="addrUrl" href="https://zillow.com${e.detailUrl}" target="_blank">
-              ${e.addr}
-              </a>
+              ${ e.realtorImage ? 
+                `<a class="h5 addr" id="addrUrl" href="https://www.realtor.com/realestateandhomes-detail/M${e.realtorLink}" target="_blank">${e.addr}</a>`
+                : 
+                `<a class="h5 addr" id="addrUrl" href="https://zillow.com${e.detailUrl}" target="_blank">${e.addr}</a>`                                                                                             
+              }
               <a target="_blank" style="float: right" href="https://www.google.com/search?q=${e.addr}"></a>  
               <p class="mb-0 type">${toCamel(e.homeType)}</p>
               <p class="mb-0">${e.price} Assessed</p>
@@ -148,8 +161,9 @@ const hideSkeletons = () => {
   );
 }
 
-// fetch Zillow streetview metadata
-const getStreetViewMeta = async (url) => {
+
+// fetch
+const fetchImage = async (url) => {
   const fetchResult = fetch(url);
   const response = await fetchResult;
   const jsonData = await response.json();
@@ -255,6 +269,10 @@ const getJSON = async () => {
           beds: home.beds ? home.beds : "--",
           baths: home.baths ? home.baths : "--",
           status: home.statusText ? home.statusText : "",
+          svStatus: null,
+          realtorLink: null,
+          realtorImage: null,
+          zillowImage: home.imgSrc,
           imgSrc: home.imgSrc,
           distance: Math.round(
             getDistance(
@@ -266,27 +284,48 @@ const getJSON = async () => {
             ) * 1000
           ),
         };
+
+        let findRealtorAddr = "https://parser-external.geo.moveaws.com/suggest?client_id=rdc-x&input="
+        let realtorLink = fetchImage(findRealtorAddr + encodeURI(house.addr))
+
+        Promise.resolve(realtorLink).then((val) => {
+          house.realtorLink = val.autocomplete[0].mpr_id;
+          chrome.runtime.sendMessage({ realtorID: house.realtorLink }, async (response) => {
+            console.log(response)
+            house.realtorImage = response;
+            if(house.realtorImage !== null) {
+              house.imgSrc = response;
+            }
+          });
+        });
+
+
+
         let addrStreetview = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${encodeURIComponent(
           house.addr
         )}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
-        let metaDataOne = getStreetViewMeta(addrStreetview);
+        let metaDataOne = fetchImage(addrStreetview);
         let metaDataTwo;
 
         Promise.resolve(metaDataOne).then((val) => {
-          if (val.status === "OK") {
-            house.pano_id = val.pano_id;
-            house.svLat = val.location.lat;
-            house.svLng = val.location.lng;
-              house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${encodeURIComponent(
-                house.addr
-              )}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
-          } else if (val.status !== "OK") {
-            metaDataTwo = getStreetViewMeta(home.streetViewMetadataURL);
-            Promise.resolve(metaDataTwo).then((value) => {
-              if (value.status === "OK") {
-                house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${home.latLong.latitude},${home.latLong.longitude}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
-              }
-            });
+          if(!house.realtorImage) {
+            if (val.status === "OK") {
+              house.pano_id = val.pano_id;
+              house.svLat = val.location.lat;
+              house.svLng = val.location.lng;
+              house.svStatus = "OK"
+                house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${encodeURIComponent(
+                  house.addr
+                )}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
+            } else if (val.status !== "OK") {
+              metaDataTwo = fetchImage(home.streetViewMetadataURL);
+              Promise.resolve(metaDataTwo).then((value) => {
+                if (value.status === "OK") {
+                  house.svStatus = "OK"
+                  house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${home.latLong.latitude},${home.latLong.longitude}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
+                }
+              });
+            }
           }
         });
         listingsArr.push(house);
@@ -306,7 +345,7 @@ const getJSON = async () => {
       $(function () {
         $('[data-toggle="tooltip"]').tooltip()
       })
-    }, 2000);
+    }, 5000);
   });
 };
 

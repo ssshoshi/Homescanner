@@ -1,4 +1,6 @@
-$primary: #006aff;
+$zillow: #006aff;
+$realtor: rgb(217, 34, 40);
+
 
 @mixin card-buttons() {
   position: absolute;
@@ -10,9 +12,21 @@ $primary: #006aff;
   object-fit: cover;
 }
 
-.card {
+.zcard {
   box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 10px 0px;
-  border-bottom: 3px solid $primary;
+  border-bottom: 3px solid $zillow;
+  &:hover {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  }
+  &:hover .card-img {
+    transform: scale(1.2);
+    transition: all 0.25s ease-in-out;
+  }
+}
+
+.rcard {
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 10px 0px;
+  border-bottom: 3px solid $realtor;
   &:hover {
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
   }
@@ -23,7 +37,7 @@ $primary: #006aff;
 }
 
 nav {
-  border-bottom: 1px solid $primary;
+  border-bottom: 1px solid $zillow;
 }
 
 #coords,
@@ -40,7 +54,7 @@ nav {
 }
 
 h2 {
-  color: $primary !important;
+  color: $zillow !important;
   font-weight: bold !important;
 }
 
@@ -87,37 +101,60 @@ h2 {
   border-bottom: 3px solid #b6b6b6;
 }
 
-.tooltip-inner {
-  background: $primary;
+.tooltip-inner-z {
+  background: $zillow;
   color: white;
-  border: 1px solid $primary;
+  border: 1px solid $zillow;
 }
 
-.fa {
-  color: $primary;
+.tooltip-inner-r {
+  background: $realtor !important;
+  color: white;
+  border: 1px solid $realtor !important;
 }
 
-.btn {
-  color: $primary;
+.zillow {
+  color: $zillow !important;
+}
+.realtor {
+  color: $realtor !important;
+}
+
+.zbtn {
+  color: $zillow;
   &:hover {
     color: white;
-    background-color: $primary;
-    border: $primary solid 1px;
+    background-color: $zillow;
+    border: $zillow solid 1px;
   }
   &:hover i {
     color: white;
   }
   &:active {
-    color: $primary;
+    color: $zillow;
+  }
+}
+.rbtn {
+  color: $realtor;
+  &:hover {
+    color: white;
+    background-color: $realtor;
+    border: $realtor solid 1px;
+  }
+  &:hover i {
+    color: white;
+  }
+  &:active {
+    color: $realtor;
   }
 }
 
 .spinner-border {
-  color: $primary;
+  color: $zillow;
 }
 
 #search {
-  border: 1px solid $primary;
+  border: 1px solid $zillow;
 }
 
 .modal-body {
@@ -203,7 +240,7 @@ div.loading {
 #threeColumn {
   background-color: #e2e2e2;
   &:hover {
-    background-color: $primary;
+    background-color: $zillow;
   }
 }
 

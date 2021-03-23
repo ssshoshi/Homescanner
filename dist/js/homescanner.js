@@ -64,40 +64,33 @@ const renderListing = async (e) => {
     "beforeend",
     `
   <div class="col-md-6 mb-2 listing">
-      <div class="card mb-2 h-100">
+    ${ e.realtorImage ? 
+      //realtor
+      `<div class="rcard mb-2 h-100">
           <div class="embed-responsive embed-responsive-16by9">
           <div class="maplinks">
-              <a class="btn btn-sm btn-light" href="http://maps.google.com/maps?t=k&q=loc:${e.lat}+${e.long}" target="_blank">Google Map</a>
-              <a class="btn btn-sm btn-light" href="https://www.bing.com/maps?where1=${e.lat},${e.long}&style=h&lvl=18" target="_blank">Bing Map</a>
+          <a class="btn rbtn btn-sm btn-light" href="https://www.bing.com/maps?where1=${e.lat},${e.long}&style=h&lvl=18" target="_blank">Bing Map</a>
+          <a class="btn rbtn btn-sm btn-light" href="http://maps.google.com/maps?t=k&q=loc:${e.lat}+${e.long}" target="_blank">Google Map</a>
           </div>
           <div class="otherLinks">
           ${
             e.svStatus === "OK" ?
-              `<a class="btn btn-sm btn-light" href="https://www.google.com/maps/@?api=1&map_action=pano&pano=${e.pano_id}&viewpoint=${e.svLat},${e.svLng}" target="_blank" data-toggle="tooltip" data-placement="top" title="Streetview"><i class="fa fa-street-view"></i></a>`
+            `<a class="btn rbtn btn-sm btn-light" href="https://www.google.com/maps/@?api=1&map_action=pano&pano=${e.pano_id}&viewpoint=${e.svLat},${e.svLng}" target="_blank" data-toggle="tooltip" data-placement="top" title="Streetview"><i class="fa fa-street-view"></i></a>`
             :
-              `<a class="btn btn-sm btn-secondary disabled" data-toggle="tooltip" data-placement="top" title="No Streetview"><i class="fa fa-street-view"></i></a>`
-
+            `<a class="btn rbtn btn-sm btn-secondary disabled" data-toggle="tooltip" data-placement="top" title="No Streetview"><i class="fa fa-street-view"></i></a>`
           }
-              <a class="btn btn-sm btn-light" href="https://www.google.com/search?q=${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
-              <a class="btn btn-sm btn-light" href="https://www.whitepages.com/address/${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
-              ${
-                !e.realtorImage ? `<a class="btn btn-sm btn-light" href="https://www.realtor.com/realestateandhomes-detail/M${e.realtorLink}" target="_blank" data-toggle="tooltip" data-placement="top" title="Realtor">R</a>`
-                : `<a class="btn btn-sm btn-light" href="https://zillow.com${e.detailUrl}" target="_blank" data-toggle="tooltip" data-placement="top" title="Zillow">Z</a>`
-
-              }
+          <a class="btn rbtn btn-sm btn-light ttr" href="https://www.whitepages.com/address/${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
+          <a class="btn rbtn btn-sm btn-light ttr" href="https://www.google.com/search?q=${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
+          <a class="btn rbtn btn-sm btn-light ttr" href="https://zillow.com${e.detailUrl}" target="_blank" data-toggle="tooltip" data-placement="top" title="Zillow">Z</a>
           </div>
-          <a class="btn btn-sm btn-light expand" data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
+          <a class="btn rbtn btn-sm btn-light expand" data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
           <div class="toggle">
               <img src="${e.imgSrc}" loading="lazy" class="card-img embed-responsive-item"/>
           </div>
           </div>
           <div class="card-body row pb-0 pt-0">
           <div class="col-6 align-self-start mt-2">
-              ${ e.realtorImage ? 
-                `<a class="h5 addr" id="addrUrl" href="https://www.realtor.com/realestateandhomes-detail/M${e.realtorLink}" target="_blank">${e.addr}</a>`
-                : 
-                `<a class="h5 addr" id="addrUrl" href="https://zillow.com${e.detailUrl}" target="_blank">${e.addr}</a>`                                                                                             
-              }
+              <a class="h5 addr realtor" id="addrUrl" href="https://www.realtor.com/realestateandhomes-detail/M${e.realtorLink}" target="_blank">${e.addr}</a>
               <a target="_blank" style="float: right" href="https://www.google.com/search?q=${e.addr}"></a>  
               <p class="mb-0 type">${toCamel(e.homeType)}</p>
               <p class="mb-0">${e.price} Assessed</p>
@@ -110,7 +103,49 @@ const renderListing = async (e) => {
               <div>${e.status}</div>
           </div>
           </div>
+      </div>`
+      :
+      //zillow
+      `<div class="zcard mb-2 h-100">
+      <div class="embed-responsive embed-responsive-16by9">
+      <div class="maplinks">
+          <a class="btn zbtn btn-sm btn-light" href="http://maps.google.com/maps?t=k&q=loc:${e.lat}+${e.long}" target="_blank">Google Map</a>
+          <a class="btn zbtn btn-sm btn-light" href="https://www.bing.com/maps?where1=${e.lat},${e.long}&style=h&lvl=18" target="_blank">Bing Map</a>
       </div>
+      <div class="otherLinks">
+      ${
+        e.svStatus === "OK" ?
+          `<a class="btn zbtn btn-sm btn-light" href="https://www.google.com/maps/@?api=1&map_action=pano&pano=${e.pano_id}&viewpoint=${e.svLat},${e.svLng}" target="_blank" data-toggle="tooltip" data-placement="top" title="Streetview"><i class="fa fa-street-view"></i></a>`
+        :
+          `<a class="zbtn btn btn-sm btn-secondary disabled" data-toggle="tooltip" data-placement="top" title="No Streetview"><i class="fa fa-street-view"></i></a>`
+
+      }
+          <a class="btn zbtn btn-sm btn-light ttz" href="https://www.google.com/search?q=${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
+          <a class="btn zbtn btn-sm btn-light ttz" href="https://www.whitepages.com/address/${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
+          <a class="btn zbtn btn-sm btn-light ttz" href="https://www.realtor.com/realestateandhomes-detail/M${e.realtorLink}" target="_blank" data-toggle="tooltip" data-placement="top" title="Realtor">R</a>
+      </div>
+      <a class="btn zbtn btn-sm btn-light expand" data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
+      <div class="toggle">
+          <img src="${e.imgSrc}" loading="lazy" class="card-img embed-responsive-item"/>
+      </div>
+      </div>
+      <div class="card-body row pb-0 pt-0">
+      <div class="col-6 align-self-start mt-2">
+          <a class="h5 addr zillow" id="addrUrl" href="https://zillow.com${e.detailUrl}" target="_blank">${e.addr}</a>
+          <a target="_blank" style="float: right" href="https://www.google.com/search?q=${e.addr}"></a>  
+          <p class="mb-0 type">${toCamel(e.homeType)}</p>
+          <p class="mb-0">${e.price} Assessed</p>
+          <p class="mb-0 geo">${e.lat}, ${e.long}</p>
+      </div>
+      <div class="col-6 text-right align-self-start mt-2">
+          <div><strong>${e.sqft}</strong> sqft</div>
+          <div><strong>${e.beds}</strong> bd <strong class="font-weight-bold">${e.baths}</strong> ba</div>
+          <div><strong>${e.distance}</strong>m away</div>
+          <div>${e.status}</div>
+      </div>
+      </div>
+  </div>`
+    }
   </div>
 `
   );
@@ -343,7 +378,13 @@ const getJSON = async () => {
       render();
       document.querySelector('#avgHomeValue').innerText = `${avgHomeValue()}`
       $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
+        $('.ttz').tooltip({
+          template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-z"></div></div>'
+
+        })
+        $(".ttr").tooltip({
+          template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-r"></div></div>'
+        })
       })
     }, 5000);
   });

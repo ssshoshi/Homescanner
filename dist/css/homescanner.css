@@ -3,18 +3,36 @@
      object-fit: cover;
 }
 
-.card {
+.zcard {
   -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 10px 0px;
           box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 10px 0px;
   border-bottom: 3px solid #006aff;
 }
 
-.card:hover {
+.zcard:hover {
   -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
           box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
 }
 
-.card:hover .card-img {
+.zcard:hover .card-img {
+  -webkit-transform: scale(1.2);
+          transform: scale(1.2);
+  -webkit-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out;
+}
+
+.rcard {
+  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 10px 0px;
+          box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 10px 0px;
+  border-bottom: 3px solid #d92228;
+}
+
+.rcard:hover {
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.rcard:hover .card-img {
   -webkit-transform: scale(1.2);
           transform: scale(1.2);
   -webkit-transition: all 0.25s ease-in-out;
@@ -92,32 +110,60 @@ h2 {
   border-bottom: 3px solid #b6b6b6;
 }
 
-.tooltip-inner {
+.tooltip-inner-z {
   background: #006aff;
   color: white;
   border: 1px solid #006aff;
 }
 
-.fa {
+.tooltip-inner-r {
+  background: #d92228 !important;
+  color: white;
+  border: 1px solid #d92228 !important;
+}
+
+.zillow {
+  color: #006aff !important;
+}
+
+.realtor {
+  color: #d92228 !important;
+}
+
+.zbtn {
   color: #006aff;
 }
 
-.btn {
-  color: #006aff;
-}
-
-.btn:hover {
+.zbtn:hover {
   color: white;
   background-color: #006aff;
   border: #006aff solid 1px;
 }
 
-.btn:hover i {
+.zbtn:hover i {
   color: white;
 }
 
-.btn:active {
+.zbtn:active {
   color: #006aff;
+}
+
+.rbtn {
+  color: #d92228;
+}
+
+.rbtn:hover {
+  color: white;
+  background-color: #d92228;
+  border: #d92228 solid 1px;
+}
+
+.rbtn:hover i {
+  color: white;
+}
+
+.rbtn:active {
+  color: #d92228;
 }
 
 .spinner-border {

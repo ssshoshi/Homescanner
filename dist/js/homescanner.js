@@ -272,9 +272,15 @@ const getMapBoundaries = (lat, long) => {
   return JSON.stringify(coords);
 };
 
+let promise1;
+let promise2;
+let promises = [];
+
 // fetch url and push listings to array
 const getJSON = async () => {
+
   chrome.runtime.sendMessage({ urlParams: urlParams }, async (response) => {
+
     let homes = response;
     console.log(homes);
     for (let home of homes) {
@@ -307,7 +313,8 @@ const getJSON = async () => {
           svStatus: null,
           realtorLink: null,
           realtorImage: null,
-          zillowImage: home.imgSrc,
+          zillowImage: home.imgSrc.includes("staticmap") ? null : home.imgSrc,
+          satImage: home.imgSrc.includes("staticmap") ? home.imgSrc : null,
           imgSrc: home.imgSrc,
           distance: Math.round(
             getDistance(
@@ -319,20 +326,24 @@ const getJSON = async () => {
             ) * 1000
           ),
         };
+        
+        house.imgSrc = house.zillowImage ? house.zillowImage : null;
 
         let findRealtorAddr = "https://parser-external.geo.moveaws.com/suggest?client_id=rdc-x&input="
         let realtorLink = fetchImage(findRealtorAddr + encodeURI(house.addr))
 
-        Promise.resolve(realtorLink).then((val) => {
+         promise1 = Promise.resolve(realtorLink).then((val) => {
           house.realtorLink = val.autocomplete[0].mpr_id;
-          chrome.runtime.sendMessage({ realtorID: house.realtorLink }, async (response) => {
-            console.log(response)
-            house.realtorImage = response;
-            if(house.realtorImage !== null) {
-              house.imgSrc = response;
-            }
-          });
-        });
+          if(!house.zillowImage) {
+            chrome.runtime.sendMessage({ realtorID: house.realtorLink }, (response) => {
+              console.log(response)
+              house.realtorImage = response;
+              if(house.realtorImage) {
+                house.imgSrc = response;
+              }
+            });
+          }
+        }).catch((err) => { console.log(err)});
 
 
 
@@ -342,8 +353,8 @@ const getJSON = async () => {
         let metaDataOne = fetchImage(addrStreetview);
         let metaDataTwo;
 
-        Promise.resolve(metaDataOne).then((val) => {
-          if(!house.realtorImage) {
+        if(!house.realtorImage && !house.zillowImage) {
+         promise2 = Promise.resolve(metaDataOne).then((val) => {
             if (val.status === "OK") {
               house.pano_id = val.pano_id;
               house.svLat = val.location.lat;
@@ -358,37 +369,45 @@ const getJSON = async () => {
                 if (value.status === "OK") {
                   house.svStatus = "OK"
                   house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${home.latLong.latitude},${home.latLong.longitude}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
+                } else{
+                  house.imgSrc = house.satImage;
                 }
               });
             }
           }
-        });
+        );
+        }
+        promises.push(promise1, promise2)
         listingsArr.push(house);
       }
     }
 
     // wait 2 seconds then render after Promises resolve
-    setTimeout(() => {
-      hideSkeletons();
-      document.querySelector(
-        "#resultsNum"
-      ).innerHTML = `<strong>${listingsArr.length}</strong> Results`;
-      listingsArr.sort((a, b) => a.distance - b.distance);
-      console.log(listingsArr);
-      render();
-      document.querySelector('#avgHomeValue').innerText = `${avgHomeValue()}`
-      $(function () {
-        $('.ttz').tooltip({
-          template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-z"></div></div>'
+    Promise.allSettled(promises).then(()=> {
+      setTimeout(() => {
+        hideSkeletons();
+        document.querySelector(
+          "#resultsNum"
+        ).innerHTML = `<strong>${listingsArr.length}</strong> Results`;
+        listingsArr.sort((a, b) => a.distance - b.distance);
+        console.log(listingsArr);
+        render();
+        document.querySelector('#avgHomeValue').innerText = `${avgHomeValue()}`
+        $(function () {
+          $('.ttz').tooltip({
+            template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-z"></div></div>'
+  
+          })
+          $(".ttr").tooltip({
+            template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-r"></div></div>'
+          })
+        })
+      }, 1000);
+    })
 
-        })
-        $(".ttr").tooltip({
-          template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-r"></div></div>'
-        })
-      })
-    }, 5000);
   });
 };
+
 
 //populate modal
 $("#exampleModalCenter").on("show.bs.modal", (event) => {
@@ -436,12 +455,9 @@ const avgHomeValue = () => {
     if(listing.price.localeCompare("--") !== 0 && listing.price.localeCompare("$--") !== 0) {
       let price = parseInt(listing.price.replace(/\D/g,''));
       total += price;
-      console.log(price)
       totalHomesWithValue++;
     }
-    console.log(total)
   }
   let average = parseInt(total/totalHomesWithValue)
-  console.log(average)
   return `$${average}K`
 }

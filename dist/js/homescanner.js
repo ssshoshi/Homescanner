@@ -115,14 +115,18 @@ const renderListing = async (e) => {
       <div class="otherLinks">
       ${
         e.svStatus === "OK" ?
-          `<a class="btn zbtn btn-sm btn-light" href="https://www.google.com/maps/@?api=1&map_action=pano&pano=${e.pano_id}&viewpoint=${e.svLat},${e.svLng}" target="_blank" data-toggle="tooltip" data-placement="top" title="Streetview"><i class="fa fa-street-view"></i></a>`
+          `<a class="btn zbtn btn-sm btn-light ttz" href="https://www.google.com/maps/@?api=1&map_action=pano&pano=${e.pano_id}&viewpoint=${e.svLat},${e.svLng}" target="_blank" data-toggle="tooltip" data-placement="top" title="Streetview"><i class="fa fa-street-view"></i></a>`
         :
           `<a class="zbtn btn btn-sm btn-secondary disabled" data-toggle="tooltip" data-placement="top" title="No Streetview"><i class="fa fa-street-view"></i></a>`
-
       }
           <a class="btn zbtn btn-sm btn-light ttz" href="https://www.google.com/search?q=${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
           <a class="btn zbtn btn-sm btn-light ttz" href="https://www.whitepages.com/address/${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
-          <a class="btn zbtn btn-sm btn-light ttz" href="https://www.realtor.com/realestateandhomes-detail/M${e.realtorLink}" target="_blank" data-toggle="tooltip" data-placement="top" title="Realtor">R</a>
+          ${
+            e.realtorLink ? 
+            `<a class="btn zbtn btn-sm btn-light ttz" href="https://www.realtor.com/realestateandhomes-detail/M${e.realtorLink}" target="_blank" data-toggle="tooltip" data-placement="top" title="Realtor">R</a>`
+            :
+            `<a class="btn zbtn btn-sm btn-light ttz disabled" data-toggle="tooltip" data-placement="top" title="Realtor">R</a>`
+          }
       </div>
       <a class="btn zbtn btn-sm btn-light expand" data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
       <div class="toggle">
@@ -334,7 +338,7 @@ const getJSON = async () => {
 
          promise1 = Promise.resolve(realtorLink).then((val) => {
           house.realtorLink = val.autocomplete[0].mpr_id;
-          if(!house.zillowImage) {
+          if(!house.zillowImage && house.realtorLink) {
             chrome.runtime.sendMessage({ realtorID: house.realtorLink }, (response) => {
               console.log(response)
               house.realtorImage = response;
@@ -402,7 +406,7 @@ const getJSON = async () => {
             template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-r"></div></div>'
           })
         })
-      }, 1000);
+      }, 12000);
     })
 
   });

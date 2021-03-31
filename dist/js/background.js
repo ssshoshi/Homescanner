@@ -9,29 +9,25 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     .catch((error) => console.log(error));
   return true;
   }
-});
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.msg === "ok") {
-    chrome.tabs.create({ url: "/homescanner.html" });
-  }
-});
-
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if(request.realtorID) {
     var url =
       "https://www.realtor.com/realestateandhomes-detail/M" + request.realtorID
-      // console.log(request.realtorID);
     fetch(url)
       .then((response) => response.text())
       .then((data) => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(data, "text/html");
-console.log(doc.querySelector("[data-index='1']").src)
         sendResponse(doc.querySelector("[data-index='1']").src)
       })
       .catch((error) => console.log(error));
 
     return true;
   }
+
+  if (request.msg === "ok") {
+    chrome.tabs.create({ url: "/homescanner.html" });
+  }
+
 });
+

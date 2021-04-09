@@ -6,7 +6,19 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   fetch(url)
     .then((response) => response.json())
     .then((data) => sendResponse(data.cat1.searchResults.mapResults))
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      fetch('https://www.zillow.com')
+        .then((response) => response.text())
+        .then(data => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(data, "text/html");
+          if(doc.querySelector(".error-text-content")) {
+            sendResponse("captcha")
+          }
+          // sendResponse(doc.querySelector(".error-text-content"))
+        })
+        .catch(error => console.log(error))
+    });
   return true;
   }
 

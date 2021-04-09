@@ -1,7 +1,7 @@
 let listingsArr = [];
 let lat1, long1, urlParams;
 
-//get coordinates from popup and call fetch
+//get coordinates from popup and fetch array from Zillow
 chrome.storage.local.get("data", (items) => {
   if (!chrome.runtime.error) {
     let latLong = items.data;
@@ -155,7 +155,15 @@ const renderListing = async (e) => {
   );
 }
 
-//render skeleton before listing render
+const zillowCaptcha = () => {
+  document.querySelector(".list").insertAdjacentHTML(
+    "beforeend",
+    `        <iframe id="iframeModalWindow" style="height:500px; width: 100%;" src="https://www.zillow.com" name="iframe_modal"></iframe>
+    `
+  )
+}
+
+//render skeleton before listings render
 const skeleton = () => {
   for (i=0; i < 6; i++) {
     document.querySelector(".list").insertAdjacentHTML(
@@ -189,7 +197,6 @@ const skeleton = () => {
     );
   }
 }
-skeleton();
 
 // hide skeletons before listings render
 const hideSkeletons = () => {
@@ -284,6 +291,10 @@ let promises = [];
 const getJSON = async () => {
 
   chrome.runtime.sendMessage({ urlParams: urlParams }, async (response) => {
+    if(response === "captcha") {
+      zillowCaptcha();
+    } else {
+    skeleton();
 
     let homes = response;
     console.log(homes);
@@ -408,7 +419,7 @@ const getJSON = async () => {
         })
       }, 12000);
     })
-
+  }
   });
 };
 

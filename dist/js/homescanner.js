@@ -283,6 +283,21 @@ const getMapBoundaries = (lat, long) => {
   return JSON.stringify(coords);
 };
 
+// const checkRealtorCaptcha = () => {
+// fetch("https://www.realtor.com/")
+//   .then((response) => response.text())
+//   .then((data) => {
+//     const parser = new DOMParser();
+//     const doc = parser.parseFromString(data, "text/html");
+//     console.log(doc.querySelector(".title-force"))
+//     if (doc.querySelector(".title-force")) {
+//       return true;
+//     }
+//     console.log('false');
+//     return false;
+//   })
+// }
+
 let promise1;
 let promise2;
 let promises = [];
@@ -293,6 +308,11 @@ const getJSON = async () => {
   chrome.runtime.sendMessage({ urlParams: urlParams }, async (response) => {
     if(response === "captcha") {
       zillowCaptcha();
+    } else if (response === "realtor-captcha"){
+      document.querySelector(".list").insertAdjacentHTML(
+        "beforeend",
+        `<iframe id="iframeModalWindow" style="height:500px; width: 100%;" src="https://www.realtor.com" name="iframe_modal"></iframe>`
+      )
     } else {
     skeleton();
 

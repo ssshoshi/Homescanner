@@ -367,19 +367,22 @@ const getJSON = async () => {
         let findRealtorAddr = "https://parser-external.geo.moveaws.com/suggest?client_id=rdc-x&input="
         let realtorLink = fetchImage(findRealtorAddr + encodeURI(house.addr))
 
-         promise1 = Promise.resolve(realtorLink).then((val) => {
+         promise1 = Promise.resolve(realtorLink).then(async (val) => {
           house.realtorLink = val.autocomplete[0].mpr_id;
           if(!house.zillowImage && house.realtorLink) {
-            chrome.runtime.sendMessage({ realtorID: house.realtorLink }, (response) => {
-              console.log(response)
-              house.realtorImage = response;
-              if(house.realtorImage) {
-                house.imgSrc = response;
-              }
-            });
+            const res = await fetch("https://www.realtor.com/realestateandhomes-detail/M" + house.realtorLink)
+            const doc = new DOMParser().parseFromString(await res.text(), 'text/html')
+            if (doc.querySelector("[data-index='1']").src) {
+              console.log(doc.querySelector("[data-index='1']").src)
+              house.realtorImage = doc.querySelector("[data-index='1']").src
+            } 
+            if(house.realtorImage) {
+              house.imgSrc = house.realtorImage;
+            }
           }
-        }).catch((err) => { console.log(err)});
+        })
 
+  
 
 
         let addrStreetview = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${encodeURIComponent(
@@ -419,7 +422,6 @@ const getJSON = async () => {
 
     // wait 2 seconds then render after Promises resolve
     Promise.allSettled(promises).then(()=> {
-      setTimeout(() => {
         hideSkeletons();
         document.querySelector(
           "#resultsNum"
@@ -437,7 +439,6 @@ const getJSON = async () => {
             template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-r"></div></div>'
           })
         })
-      }, 12000);
     })
   }
   });

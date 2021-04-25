@@ -69,8 +69,8 @@ const renderListing = async (e) => {
       `<div class="rcard mb-2 h-100">
           <div class="embed-responsive embed-responsive-16by9">
           <div class="maplinks">
-          <a class="btn rbtn btn-sm btn-light" href="https://www.bing.com/maps?where1=${e.lat},${e.long}&style=h&lvl=18" target="_blank">Bing Map</a>
           <a class="btn rbtn btn-sm btn-light" href="http://maps.google.com/maps?t=k&q=loc:${e.lat}+${e.long}" target="_blank">Google Map</a>
+          <a class="btn rbtn btn-sm btn-light" href="https://www.bing.com/maps?where1=${e.lat},${e.long}&style=h&lvl=18" target="_blank">Bing Map</a>
           </div>
           <div class="otherLinks">
           ${
@@ -79,8 +79,8 @@ const renderListing = async (e) => {
             :
             `<a class="btn rbtn btn-sm btn-secondary disabled" data-toggle="tooltip" data-placement="top" title="No Streetview"><i class="fa fa-street-view"></i></a>`
           }
-          <a class="btn rbtn btn-sm btn-light ttr" href="https://www.whitepages.com/address/${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
           <a class="btn rbtn btn-sm btn-light ttr" href="https://www.google.com/search?q=${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
+          <a class="btn rbtn btn-sm btn-light ttr" href="https://www.whitepages.com/address/${e.street}/${e.zipcode}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
           <a class="btn rbtn btn-sm btn-light ttr" href="https://zillow.com${e.detailUrl}" target="_blank" data-toggle="tooltip" data-placement="top" title="Zillow">Z</a>
           </div>
           <a class="btn rbtn btn-sm btn-light expand" data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
@@ -120,7 +120,7 @@ const renderListing = async (e) => {
           `<a class="zbtn btn btn-sm btn-secondary disabled" data-toggle="tooltip" data-placement="top" title="No Streetview"><i class="fa fa-street-view"></i></a>`
       }
           <a class="btn zbtn btn-sm btn-light ttz" href="https://www.google.com/search?q=${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Search Address"><i class="fa fa-search"></i></a>
-          <a class="btn zbtn btn-sm btn-light ttz" href="https://www.whitepages.com/address/${e.addr}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
+          <a class="btn zbtn btn-sm btn-light ttz" href="https://www.whitepages.com/address/${e.street}/${e.zipcode}" target="_blank" data-toggle="tooltip" data-placement="top" title="Whitepages"><i class="fa fa-book"></i></a>
           ${
             e.realtorLink ? 
             `<a class="btn zbtn btn-sm btn-light ttz" href="https://www.realtor.com/realestateandhomes-detail/M${e.realtorLink}" target="_blank" data-toggle="tooltip" data-placement="top" title="Realtor">R</a>`
@@ -323,6 +323,7 @@ const getJSON = async () => {
         let house = {
           pano_id: null,
           addr: home.address !== "--" ? home.address : home.detailUrl.split("/")[2].replace(/-/g, " "),
+          street: null,
           city: home.hasOwnProperty("hdpData")
             ? home.hdpData.homeInfo.city
             : "--",
@@ -368,7 +369,13 @@ const getJSON = async () => {
         let realtorLink = fetchImage(findRealtorAddr + encodeURI(house.addr))
 
          promise1 = Promise.resolve(realtorLink).then(async (val) => {
-          house.realtorLink = val.autocomplete[0].mpr_id;
+
+          for(i of val.autocomplete) {
+            if(i.area_type === "address") {
+              house.realtorLink = i.mpr_id;
+              house.street = i.line;
+            }
+          }
           if(!house.zillowImage && house.realtorLink) {
             const res = await fetch("https://www.realtor.com/realestateandhomes-detail/M" + house.realtorLink)
             const doc = new DOMParser().parseFromString(await res.text(), 'text/html')
@@ -391,22 +398,28 @@ const getJSON = async () => {
         let metaDataOne = fetchImage(addrStreetview);
         let metaDataTwo;
 
-        if(!house.realtorImage && !house.zillowImage) {
+        
          promise2 = Promise.resolve(metaDataOne).then((val) => {
             if (val.status === "OK") {
               house.pano_id = val.pano_id;
               house.svLat = val.location.lat;
               house.svLng = val.location.lng;
               house.svStatus = "OK"
-                house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${encodeURIComponent(
-                  house.addr
-                )}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
+              house.streetViewURL = `https://www.google.com/maps/@?api=1&map_action=pano&pano=F8XGYxNOWhYgsjU-cUytow&viewpoint=${val.location.lat},${val.location.lng}`
+              if(!house.realtorImage && !house.zillowImage) {
+              house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${encodeURIComponent(
+                house.addr
+              )}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
+              }
             } else if (val.status !== "OK") {
               metaDataTwo = fetchImage(home.streetViewMetadataURL);
               Promise.resolve(metaDataTwo).then((value) => {
                 if (value.status === "OK") {
                   house.svStatus = "OK"
+                  house.streetViewURL = `https://www.google.com/maps/@?api=1&map_action=pano&pano=F8XGYxNOWhYgsjU-cUytow&viewpoint=${home.latLong.latitude},${home.latLong.longitude}`
+                  if(!house.realtorImage && !house.zillowImage) {
                   house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${home.latLong.latitude},${home.latLong.longitude}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
+                  }
                 } else{
                   house.imgSrc = house.satImage;
                 }
@@ -414,13 +427,13 @@ const getJSON = async () => {
             }
           }
         );
-        }
+    
         promises.push(promise1, promise2)
         listingsArr.push(house);
       }
     }
 
-    // wait 2 seconds then render after Promises resolve
+    // render after Promises resolve
     Promise.allSettled(promises).then(()=> {
         hideSkeletons();
         document.querySelector(

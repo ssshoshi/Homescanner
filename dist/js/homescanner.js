@@ -84,9 +84,15 @@ const renderListing = async (e) => {
           <a class="btn rbtn btn-sm btn-light ttr" href="https://zillow.com${e.detailUrl}" target="_blank" data-toggle="tooltip" data-placement="top" title="Zillow">Z</a>
           </div>
           <a class="btn rbtn btn-sm btn-light expand" data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
-          <div class="toggle">
-              <img src="${e.imgSrc}" loading="lazy" class="card-img embed-responsive-item"/>
-          </div>
+          ${
+            (e.zillowLink || e.realtorLink) && e.svStatus === "OK" ? 
+          `<div class="toggle">
+            <img src="${e.imgSrc}" loading="lazy" class="card-img embed-responsive-item"/>
+            <img src="${e.svImage}" loading="lazy" style="display:none" class="card-img embed-responsive-item"/>
+          </div>`
+          :
+          `<img src="${e.imgSrc}" loading="lazy" class="card-img embed-responsive-item"/>`
+          }
           </div>
           <div class="card-body row pb-0 pt-0">
           <div class="col-6 align-self-start mt-2">
@@ -129,9 +135,15 @@ const renderListing = async (e) => {
           }
       </div>
       <a class="btn zbtn btn-sm btn-light expand" data-img="${e.imgSrc}" data-toggle="modal" data-target="#exampleModalCenter"><i class="fa fa-arrows-alt"></i></a>
-      <div class="toggle">
-          <img src="${e.imgSrc}" loading="lazy" class="card-img embed-responsive-item"/>
-      </div>
+      ${
+        (e.zillowLink || e.realtorLink) && e.svStatus === "OK" ? 
+      `<div class="toggle">
+        <img src="${e.imgSrc}" loading="lazy" class="card-img embed-responsive-item"/>
+        <img src="${e.svImage}" loading="lazy" style="display:none" class="card-img embed-responsive-item"/>
+      </div>`
+      :
+      `<img src="${e.imgSrc}" loading="lazy" class="card-img embed-responsive-item"/>`
+      }
       </div>
       <div class="card-body row pb-0 pt-0">
       <div class="col-6 align-self-start mt-2">
@@ -154,6 +166,8 @@ const renderListing = async (e) => {
 `
   );
 }
+
+
 
 const zillowCaptcha = () => {
   document.querySelector(".list").insertAdjacentHTML(
@@ -206,6 +220,7 @@ const hideSkeletons = () => {
     }
   );
 }
+
 
 
 // fetch
@@ -306,13 +321,14 @@ let promises = [];
 const getJSON = async () => {
 
   chrome.runtime.sendMessage({ urlParams: urlParams }, async (response) => {
-    if(response === "captcha") {
-      zillowCaptcha();
-    } else if (response === "realtor-captcha"){
+    console.log(response)
+    if(response === "rCaptcha") {
       document.querySelector(".list").insertAdjacentHTML(
         "beforeend",
         `<iframe id="iframeModalWindow" style="height:500px; width: 100%;" src="https://www.realtor.com" name="iframe_modal"></iframe>`
       )
+    } else if (response === "zCaptcha"){
+      zillowCaptcha()
     } else {
     skeleton();
 
@@ -405,6 +421,10 @@ const getJSON = async () => {
               house.svLat = val.location.lat;
               house.svLng = val.location.lng;
               house.svStatus = "OK"
+              house.svImage = `https://maps.googleapis.com/maps/api/streetview?location=${encodeURIComponent(
+                house.addr
+              )}&size=800x600&key=AIzaSyBot9JtFX4Hqs-Ri6N3A8K1Rl5XZD3ssyI`;
+
               house.streetViewURL = `https://www.google.com/maps/@?api=1&map_action=pano&pano=F8XGYxNOWhYgsjU-cUytow&viewpoint=${val.location.lat},${val.location.lng}`
               if(!house.realtorImage && !house.zillowImage) {
               house.imgSrc = `https://maps.googleapis.com/maps/api/streetview?location=${encodeURIComponent(
@@ -443,6 +463,10 @@ const getJSON = async () => {
         console.log(listingsArr);
         render();
         document.querySelector('#avgHomeValue').innerText = `${avgHomeValue()}`
+        $(".toggle").click(function(){
+          $(this).find('img').toggle()
+        })
+
         $(function () {
           $('.ttz').tooltip({
             template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner tooltip-inner-z"></div></div>'
